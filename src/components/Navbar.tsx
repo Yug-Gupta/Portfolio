@@ -52,23 +52,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a 
             href="#hero" 
             id="brand-logo-link"
-            className="flex items-center gap-3 group focus:outline-hidden"
+            className="flex items-center gap-3 group"
           >
-            <div className="w-8 h-8 rounded-md bg-[#ECE7DF] border border-[#DDD6CA] flex items-center justify-center text-[#161514] font-serif font-medium text-sm transition-colors group-hover:border-[#C88A58]">
+            <div className="w-8 h-8 rounded-md bg-chip border border-[#DDD6CA] flex items-center justify-center text-ink font-serif font-medium text-sm transition-colors group-hover:border-accent">
               {profile.name.split(' ').map(n => n[0]).join('') || 'YG'}
             </div>
             <div className="flex flex-col text-left">
-              <span className="font-serif text-base text-[#161514] tracking-tight group-hover:text-[#C88A58] transition-colors">
+              <span className="font-serif text-base text-ink tracking-tight group-hover:text-accent transition-colors">
                 {profile.name}
               </span>
-              <span className="text-[11px] text-[#6E675E] font-mono tracking-normal hidden sm:inline-block">
+              <span className="type-label hidden sm:inline-block">
                 {profile.title}
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#ECE7DF] px-2 py-1 rounded-full border border-[#DFD8CC]">
+          <nav aria-label="Primary" className="hidden md:flex items-center gap-1 bg-chip px-2 py-1 rounded-full border border-[#DFD8CC]">
             {navLinks.map((link) => {
               const isActive = activeSection === link.href.replace('#', '');
               return (
@@ -76,10 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   key={link.name}
                   href={link.href}
                   id={`nav-link-${link.name.toLowerCase()}`}
-                  className={`px-3.5 py-1 rounded-full text-xs font-sans transition-all duration-200 ${
+                  aria-current={isActive ? 'true' : undefined}
+                  className={`px-3.5 py-1 rounded-full text-sm font-sans transition-colors duration-200 ${
                     isActive
-                      ? 'bg-[#FFFFFF] text-[#161514] font-medium shadow-xs'
-                      : 'text-[#6E675E] hover:text-[#161514] hover:bg-[#F3EFE8]'
+                      ? 'bg-surface text-ink font-medium shadow-xs'
+                      : 'text-muted hover:text-ink hover:bg-[#F3EFE8]'
                   }`}
                 >
                   {link.name}
@@ -94,18 +95,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenResume}
               id="view-resume-btn"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-sans font-medium text-[#FAF8F5] bg-[#161514] hover:bg-[#2C2925] rounded-lg transition-colors cursor-pointer shadow-xs"
+              className="btn btn-sm btn-secondary"
             >
-              <FileText className="w-3.5 h-3.5" />
-              <span>CV / Resume</span>
+              <FileText className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
+              <span>Resume</span>
             </button>
 
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               id="mobile-menu-toggle-btn"
-              aria-label="Toggle navigation menu"
-              className="md:hidden p-2 rounded-lg bg-[#ECE7DF] text-[#5C564D] border border-[#DDD6CA] cursor-pointer"
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-menu"
+              className="md:hidden btn btn-icon btn-secondary"
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
@@ -127,10 +130,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive ? 'true' : undefined}
                   className={`block px-3 py-2 rounded-md text-sm transition-colors ${
                     isActive
-                      ? 'bg-[#ECE7DF] text-[#161514] font-medium'
-                      : 'text-[#6E675E] hover:bg-[#ECE7DF] hover:text-[#161514]'
+                      ? 'bg-chip text-ink font-medium'
+                      : 'text-muted hover:bg-chip hover:text-ink'
                   }`}
                 >
                   {link.name}

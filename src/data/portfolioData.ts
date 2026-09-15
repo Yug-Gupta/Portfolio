@@ -9,9 +9,10 @@ export const defaultProfile: UserProfile = {
   phone: '+91-8081697640',
   availability: 'Available for full-time',
   bioParagraphs: [
-    "I'm a B.Tech (CSIT) student at KIET Group of Institutions with strong foundations in full-stack web development, AI/LLM-powered systems, data structures & algorithms, and cloud computing. I have engineered and deployed production-grade full-stack applications and a Python-based LLM/graph-database system, containerized with Docker and backed by CI/CD pipelines.",
-    "My core stack spans React.js, Node.js, Express.js, and MongoDB on the web side, and Python, Neo4j, and the Google Gemini API for AI — with AWS, Docker, and CI/CD for deployment. I care about clean architecture, secure APIs with JWT authentication, and fast, well-crafted user interfaces.",
-    'Beyond building, I am an active open-source contributor and competitive programmer with 500+ DSA problems solved across LeetCode, CodeChef, and HackerRank. I hold the AWS Certified Solutions Architect – Associate and AWS Certified Developer – Associate credentials, and I enjoy turning complex problems into reliable, well-structured software.'
+    "I'm a B.Tech (CSIT) student at KIET Group of Institutions. My focus is full-stack web development, applied AI/LLM systems, and the computer-science fundamentals behind both.",
+    "I've engineered and deployed full-stack applications and a Python-based LLM and graph-database system, containerized with Docker and backed by CI/CD pipelines.",
+    "My core stack is React, Node.js, Express, and MongoDB on the web side, and Python, Neo4j, and the Google Gemini API for AI — with AWS, Docker, and CI/CD for deployment.",
+    "I care about clean architecture, JWT-secured APIs, and fast, accessible interfaces. I'm currently going deeper on data structures & algorithms and open-source contribution."
   ],
   stats: [
     { label: 'DSA Problems Solved', value: '500+', description: 'Across LeetCode, CodeChef & HackerRank' },

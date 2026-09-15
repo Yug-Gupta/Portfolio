@@ -1,54 +1,181 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Single source of truth for colour, type and surfaces. Prefer the generated
+   utilities (bg-surface, text-body, border-line, ...) over raw hex values.
+--------------------------------------------------------------------------- */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-canvas: #F6F3EE;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #FAF7F2;
+  --color-chip: #ECE7DF;
+  --color-ink: #161514;
+  --color-ink-soft: #2C2925;
+  --color-body: #4A453E;
+  --color-muted: #6E675E;
+  --color-faint: #80776C;
+  --color-line: #E5DFD6;
+  --color-line-strong: #C8BFB2;
+  --color-accent: #C88A58;
+  --color-accent-strong: #B86B35;
+}
+
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     overflow-x: hidden;
-    background-color: #F6F3EE;
-    color: #161514;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  h1, h2, h3, .font-serif, .font-display {
-    font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
-    letter-spacing: -0.025em;
+
+  h1, h2, h3, h4, .font-serif, .font-display {
+    font-family: var(--font-serif);
+    letter-spacing: -0.02em;
   }
 
   code, pre, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
+  }
+
+  /* Single, consistent keyboard focus treatment across the whole app. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
   }
 }
 
-/* Subtle organic grain overlay for tactile paper feel */
-.film-grain-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
+@layer components {
+  /* --- Layout ------------------------------------------------------------ */
+  .container-page {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10;
+  }
 
-/* Editorial surface styling */
-.editorial-surface {
-  background-color: #FFFFFF;
-  border: 1px solid #E5DFD6;
-  box-shadow: 0 2px 14px -2px rgba(40, 30, 20, 0.05);
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
+  /* --- Type scale --------------------------------------------------------
+     Nine sizes total: display, section, subsection, title, body, body-sm,
+     meta/label (12px) and the serif display numeral used in stats.
+  ------------------------------------------------------------------------ */
+  .type-display {
+    @apply font-serif text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-ink leading-[1.05];
+  }
+  .type-section {
+    @apply font-serif text-3xl sm:text-4xl font-normal tracking-tight text-ink leading-tight;
+  }
+  .type-subsection {
+    @apply font-serif text-2xl font-normal tracking-tight text-ink;
+  }
+  .type-title {
+    @apply font-serif text-xl font-normal tracking-tight text-ink;
+  }
+  .type-body {
+    @apply font-sans text-base text-body leading-relaxed;
+  }
+  .type-body-sm {
+    @apply font-sans text-sm text-body leading-relaxed;
+  }
+  .type-label {
+    @apply font-mono text-xs text-muted tracking-normal;
+  }
+  .type-meta {
+    @apply font-mono text-xs text-faint tracking-normal;
+  }
+  .type-eyebrow {
+    @apply font-mono text-xs text-accent tracking-normal;
+  }
 
-.editorial-surface:hover {
-  border-color: #C8BFB2;
-  box-shadow: 0 8px 24px -4px rgba(40, 30, 20, 0.08);
-}
+  /* --- Section header rule ---------------------------------------------- */
+  .section-rule {
+    @apply flex items-center justify-between gap-3 pb-5 mb-8 border-b border-line;
+  }
 
-.editorial-surface-raised {
-  background-color: #FAF7F2;
-  border: 1px solid #E0DACF;
-  box-shadow: 0 4px 18px -3px rgba(40, 30, 20, 0.06);
+  /* --- Surfaces ---------------------------------------------------------- */
+  .card {
+    @apply rounded-xl bg-surface border border-line shadow-2xs transition-colors duration-200;
+  }
+  .card-hover {
+    @apply hover:border-line-strong;
+  }
+  .panel {
+    @apply rounded-xl bg-surface-2 border border-line;
+  }
+
+  /* --- Chips ------------------------------------------------------------- */
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-ink-soft bg-surface-2 border border-line;
+  }
+  .chip-accent {
+    @apply inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-mono text-xs font-semibold text-accent-strong bg-surface-2 border border-line;
+  }
+
+  /* --- Segmented toggle (shared by every view/category switcher) ---------- */
+  .segmented {
+    @apply inline-flex items-center gap-1 p-1 rounded-lg bg-chip border border-[#DFD8CC];
+  }
+  .segmented-item {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 font-sans text-xs text-body border border-transparent transition-colors cursor-pointer hover:text-ink;
+  }
+  .segmented-item[aria-pressed="true"] {
+    @apply bg-surface text-ink border-line font-medium shadow-xs;
+  }
+
+  /* --- Filter chip (same height as inputs so rows align) ------------------ */
+  .filter-chip {
+    @apply inline-flex items-center h-9 px-3 rounded-lg border font-sans text-xs transition-colors cursor-pointer;
+  }
+  .filter-chip[aria-pressed="false"] {
+    @apply bg-surface text-ink border-line hover:border-line-strong;
+  }
+  .filter-chip[aria-pressed="true"] {
+    @apply bg-ink text-[#FAF8F5] border-ink font-medium shadow-xs;
+  }
+
+  /* --- Buttons -----------------------------------------------------------
+     Four visual variants (primary, secondary, outline, ghost) + icon-only.
+     Sizes are separate so height stays identical everywhere.
+  ------------------------------------------------------------------------ */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-sans font-medium transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .btn-md {
+    @apply px-4 py-2.5 text-sm;
+  }
+  .btn-primary {
+    @apply bg-ink text-[#FAF8F5] border border-ink hover:bg-ink-soft shadow-xs;
+  }
+  .btn-secondary {
+    @apply bg-chip text-ink border border-line-strong hover:bg-[#E2DBD0];
+  }
+  .btn-outline {
+    @apply bg-surface text-ink border border-line hover:border-line-strong;
+  }
+  .btn-ghost {
+    @apply text-body hover:bg-chip hover:text-ink;
+  }
+  .btn-icon {
+    @apply p-2;
+  }
+
+  /* --- Inputs ------------------------------------------------------------ */
+  .input {
+    @apply w-full rounded-lg bg-surface border border-line text-ink text-sm font-sans transition-colors placeholder:text-faint focus-visible:border-accent;
+  }
+  .input-sm {
+    @apply px-3 py-2;
+  }
 }
 
 /* Minimalist scrollbar */
@@ -58,7 +185,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F6F3EE;
+  background: var(--color-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -70,5 +197,15 @@
   background: #BDB6A8;
 }
 
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
 
-
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

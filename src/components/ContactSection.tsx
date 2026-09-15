@@ -8,9 +8,9 @@ import {
   Linkedin, 
   Twitter, 
   MapPin, 
-  MessageSquare, 
   Clock, 
-  ExternalLink
+  ExternalLink,
+  User
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { UserProfile } from '../types';
@@ -27,8 +27,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
     message: ''
   });
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleCopyEmail = () => {
@@ -56,34 +54,34 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setTimeout(() => setSubmitSuccess(false), 6000);
-    }, 800);
+    const subject = encodeURIComponent(formData.subject.trim() || 'Portfolio inquiry');
+    const body = encodeURIComponent(
+      `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
+    );
+    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+
+    setFormData({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
     <section 
       id="contact" 
-      className="py-20 md:py-28 border-t border-[#E5DFD6] relative overflow-hidden text-left"
+      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container-page">
         
         {/* Section Editorial Header */}
-        <div className="flex items-center justify-between pb-6 mb-8 border-b border-[#E5DFD6]">
+        <div className="section-rule">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-[#C88A58] tracking-wider uppercase font-medium">
-              [ 06 / INITIATE DISPATCH ]
+            <span className="type-eyebrow font-medium">
+              [ 06 / Contact ]
             </span>
-            <span className="text-xs font-mono text-[#80776C] hidden sm:inline">
-              DIRECT INQUIRIES & OPPORTUNITIES
+            <span className="type-meta hidden sm:inline">
+              Direct inquiries & opportunities
             </span>
           </div>
-          <span className="text-xs font-mono text-[#80776C]">
-            RESPONSE &lt; 24H
+          <span className="type-meta">
+            Response &lt; 24h
           </span>
         </div>
 
@@ -93,12 +91,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.5 }}
-          className="max-w-xl mb-12 space-y-2"
+          className="max-w-2xl mb-12 space-y-2"
         >
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#161514] tracking-tight">
-            Initiate Contact
+          <h2 className="type-section">
+            Get in touch
           </h2>
-          <p className="text-sm text-[#5C564D] font-sans">
+          <p className="type-body-sm">
             Internships, full-time roles, collaborations, or just a good technical conversation. Reach out directly.
           </p>
         </motion.div>
@@ -115,52 +113,56 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
           >
             
             {/* Primary Email Card */}
-            <div className="p-6 rounded-xl bg-[#FFFFFF] border border-[#E5DFD6] space-y-4 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-lg bg-[#FAF7F2] text-[#C88A58] border border-[#E5DFD6]">
-                  <Mail className="w-4 h-4" />
+            <div className="card p-6 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-md bg-surface-2 text-accent border border-line">
+                    <Mail className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                  <h3 className="type-label font-medium">Email</h3>
                 </div>
                 <button
+                  type="button"
                   onClick={handleCopyEmail}
                   id="copy-email-btn"
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-mono text-[#5C564D] hover:text-[#161514] bg-[#FAF7F2] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors cursor-pointer shadow-2xs"
+                  className="btn btn-sm btn-outline"
                 >
                   {copiedEmail ? (
                     <>
-                      <Check className="w-3 h-3 text-[#C88A58]" />
-                      <span className="text-[#C88A58] font-medium">Copied</span>
+                      <Check className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
+                      <span className="text-accent font-medium">Copied</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3" />
-                      <span>Copy Email</span>
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                      <span>Copy email</span>
                     </>
                   )}
                 </button>
               </div>
 
-              <div>
-                <h3 className="text-xs font-mono text-[#80776C] uppercase tracking-wider">Direct Channel</h3>
-                <a
-                  href={`mailto:${profile.email}`}
-                  id="contact-email-link"
-                  className="font-serif text-xl text-[#161514] hover:text-[#C88A58] block truncate mt-1 tracking-tight transition-colors"
-                >
-                  {profile.email}
-                </a>
-              </div>
+              <a
+                href={`mailto:${profile.email}`}
+                id="contact-email-link"
+                className="font-serif text-xl text-ink hover:text-accent block truncate tracking-tight transition-colors"
+              >
+                {profile.email}
+              </a>
 
-              <div className="flex items-center gap-2 text-xs text-[#80776C] pt-2 border-t border-[#E5DFD6] font-mono">
-                <Clock className="w-3.5 h-3.5 text-[#C88A58]" />
+              <div className="flex items-center gap-2 type-meta pt-2 border-t border-line">
+                <Clock className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
                 <span>Response time: within 24–48 hours</span>
               </div>
             </div>
 
             {/* Professional Profiles Card */}
-            <div className="p-6 rounded-xl bg-[#FFFFFF] border border-[#E5DFD6] space-y-3 shadow-2xs">
-              <h3 className="text-xs font-mono text-[#80776C] uppercase tracking-wider font-medium">
-                Profiles & Repositories
-              </h3>
+            <div className="card p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-md bg-surface-2 text-accent border border-line">
+                  <User className="w-4 h-4" aria-hidden="true" />
+                </span>
+                <h3 className="type-label font-medium">Profiles</h3>
+              </div>
 
               <div className="space-y-2">
                 {profile.socialLinks.github && (
@@ -169,16 +171,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     id="contact-social-github"
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#FAF7F2] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors group"
+                    className="flex items-center justify-between p-3 rounded-lg bg-surface-2 hover:bg-chip border border-line transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <Github className="w-4 h-4 text-[#80776C] group-hover:text-[#161514]" />
+                      <Github className="w-4 h-4 text-muted group-hover:text-ink" aria-hidden="true" />
                       <div>
-                        <div className="text-xs font-sans font-medium text-[#161514]">GitHub</div>
-                        <div className="text-[11px] text-[#80776C]">Open-source repos & tools</div>
+                        <div className="text-sm font-sans font-medium text-ink">GitHub</div>
+                        <div className="type-meta">Open-source repos & tools</div>
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#80776C] group-hover:text-[#C88A58] transition-colors" />
+                    <ExternalLink className="w-3.5 h-3.5 text-faint group-hover:text-accent transition-colors" aria-hidden="true" />
                   </a>
                 )}
 
@@ -188,16 +190,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     id="contact-social-linkedin"
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#FAF7F2] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors group"
+                    className="flex items-center justify-between p-3 rounded-lg bg-surface-2 hover:bg-chip border border-line transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <Linkedin className="w-4 h-4 text-[#80776C] group-hover:text-[#161514]" />
+                      <Linkedin className="w-4 h-4 text-muted group-hover:text-ink" aria-hidden="true" />
                       <div>
-                        <div className="text-xs font-sans font-medium text-[#161514]">LinkedIn</div>
-                        <div className="text-[11px] text-[#80776C]">Professional network</div>
+                        <div className="text-sm font-sans font-medium text-ink">LinkedIn</div>
+                        <div className="type-meta">Professional network</div>
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#80776C] group-hover:text-[#C88A58] transition-colors" />
+                    <ExternalLink className="w-3.5 h-3.5 text-faint group-hover:text-accent transition-colors" aria-hidden="true" />
                   </a>
                 )}
 
@@ -207,25 +209,32 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     id="contact-social-twitter"
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#FAF7F2] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors group"
+                    className="flex items-center justify-between p-3 rounded-lg bg-surface-2 hover:bg-chip border border-line transition-colors group"
                   >
                     <div className="flex items-center gap-3">
-                      <Twitter className="w-4 h-4 text-[#80776C] group-hover:text-[#161514]" />
+                      <Twitter className="w-4 h-4 text-muted group-hover:text-ink" aria-hidden="true" />
                       <div>
-                        <div className="text-xs font-sans font-medium text-[#161514]">Twitter / X</div>
-                        <div className="text-[11px] text-[#80776C]">Technical commentary</div>
+                        <div className="text-sm font-sans font-medium text-ink">Twitter / X</div>
+                        <div className="type-meta">Technical commentary</div>
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#80776C] group-hover:text-[#C88A58] transition-colors" />
+                    <ExternalLink className="w-3.5 h-3.5 text-faint group-hover:text-accent transition-colors" aria-hidden="true" />
                   </a>
                 )}
               </div>
             </div>
 
             {/* Location */}
-            <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E5DFD6] text-xs text-[#5C564D] flex items-start gap-2.5 font-sans shadow-2xs">
-              <MapPin className="w-4 h-4 text-[#C88A58] shrink-0 mt-0.5" />
-              <span>Based in <strong className="text-[#161514] font-medium">{profile.location}</strong>. Open to internships, full-time roles, and remote opportunities.</span>
+            <div className="card p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-md bg-surface-2 text-accent border border-line">
+                  <MapPin className="w-4 h-4" aria-hidden="true" />
+                </span>
+                <h3 className="type-label font-medium">Location</h3>
+              </div>
+              <p className="type-body-sm">
+                Based in <strong className="text-ink font-medium">{profile.location}</strong>. Open to internships, full-time roles, and remote opportunities.
+              </p>
             </div>
 
           </motion.div>
@@ -238,27 +247,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-7"
           >
-            <div className="p-6 sm:p-8 rounded-xl bg-[#FFFFFF] border border-[#E5DFD6] shadow-2xs">
+            <div className="card p-6 sm:p-8">
               
-              <h3 className="font-serif text-2xl text-[#161514] font-normal tracking-tight mb-1">
-                Dispatch Message
+              <h3 className="type-subsection mb-1">
+                Send a message
               </h3>
-              <p className="text-xs text-[#5C564D] font-sans mb-6">
-                Fill out the fields below to initiate secure communications.
+              <p className="type-body-sm mb-6">
+                Fill out the form and your email client will open with the message ready to send.
               </p>
-
-              {submitSuccess && (
-                <div 
-                  id="contact-success-banner"
-                  className="mb-6 p-3.5 rounded-lg bg-[#FAF7F2] border border-[#C88A58]/50 text-[#161514] text-xs flex items-start gap-2.5 shadow-2xs"
-                >
-                  <Check className="w-4 h-4 text-[#C88A58] shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="font-medium block text-[#161514]">Message dispatched successfully.</strong>
-                    <span className="text-[#5C564D]">I will respond shortly to {formData.email || 'your email'}.</span>
-                  </div>
-                </div>
-              )}
 
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -266,42 +262,46 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                   <div className="space-y-1.5">
                     <label 
                       htmlFor="contact-form-name"
-                      className="block text-xs font-mono text-[#80776C] uppercase tracking-wider"
+                      className="block type-label"
                     >
-                      Name <span className="text-[#C88A58]">*</span>
+                      Name <span className="text-accent" aria-hidden="true">*</span>
                     </label>
                     <input
                       type="text"
                       id="contact-form-name"
+                      name="name"
+                      autoComplete="name"
+                      required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Your name"
-                      className={`w-full px-3 py-2 rounded-lg text-xs font-sans bg-[#FAF7F2] border ${
-                        errors.name ? 'border-rose-500' : 'border-[#E5DFD6] focus:border-[#C88A58]'
-                      } text-[#161514] placeholder-[#80776C] focus:bg-[#FFFFFF] focus:outline-hidden transition-colors`}
+                      aria-invalid={Boolean(errors.name)}
+                      className={`input input-sm ${errors.name ? 'border-rose-500' : ''}`}
                     />
-                    {errors.name && <p className="text-xs text-rose-500">{errors.name}</p>}
+                    {errors.name && <p className="text-xs text-rose-600">{errors.name}</p>}
                   </div>
 
                   {/* Email Input */}
                   <div className="space-y-1.5">
                     <label 
                       htmlFor="contact-form-email"
-                      className="block text-xs font-mono text-[#80776C] uppercase tracking-wider"
+                      className="block type-label"
                     >
-                      Email <span className="text-[#C88A58]">*</span>
+                      Email <span className="text-accent" aria-hidden="true">*</span>
                     </label>
                     <input
                       type="email"
                       id="contact-form-email"
+                      name="email"
+                      autoComplete="email"
+                      required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="your@email.com"
-                      className={`w-full px-3 py-2 rounded-lg text-xs font-sans bg-[#FAF7F2] border ${
-                        errors.email ? 'border-rose-500' : 'border-[#E5DFD6] focus:border-[#C88A58]'
-                      } text-[#161514] placeholder-[#80776C] focus:bg-[#FFFFFF] focus:outline-hidden transition-colors`}
+                      aria-invalid={Boolean(errors.email)}
+                      className={`input input-sm ${errors.email ? 'border-rose-500' : ''}`}
                     />
-                    {errors.email && <p className="text-xs text-rose-500">{errors.email}</p>}
+                    {errors.email && <p className="text-xs text-rose-600">{errors.email}</p>}
                   </div>
                 </div>
 
@@ -309,17 +309,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                 <div className="space-y-1.5">
                   <label 
                     htmlFor="contact-form-subject"
-                    className="block text-xs font-mono text-[#80776C] uppercase tracking-wider"
+                    className="block type-label"
                   >
                     Subject
                   </label>
                   <input
                     type="text"
                     id="contact-form-subject"
+                    name="subject"
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder="Project inquiry / Collaboration"
-                    className="w-full px-3 py-2 rounded-lg text-xs font-sans bg-[#FAF7F2] border border-[#E5DFD6] text-[#161514] placeholder-[#80776C] focus:border-[#C88A58] focus:bg-[#FFFFFF] focus:outline-hidden transition-colors"
+                    className="input input-sm"
                   />
                 </div>
 
@@ -327,41 +328,32 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                 <div className="space-y-1.5">
                   <label 
                     htmlFor="contact-form-message"
-                    className="block text-xs font-mono text-[#80776C] uppercase tracking-wider"
+                    className="block type-label"
                   >
-                    Message <span className="text-[#C88A58]">*</span>
+                    Message <span className="text-accent" aria-hidden="true">*</span>
                   </label>
                   <textarea
                     id="contact-form-message"
+                    name="message"
                     rows={4}
+                    required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Describe your project, role, or questions..."
-                    className={`w-full px-3 py-2 rounded-lg text-xs font-sans bg-[#FAF7F2] border ${
-                      errors.message ? 'border-rose-500' : 'border-[#E5DFD6] focus:border-[#C88A58]'
-                    } text-[#161514] placeholder-[#80776C] focus:bg-[#FFFFFF] focus:outline-hidden transition-colors`}
+                    aria-invalid={Boolean(errors.message)}
+                    className={`input input-sm ${errors.message ? 'border-rose-500' : ''}`}
                   />
-                  {errors.message && <p className="text-xs text-rose-500">{errors.message}</p>}
+                  {errors.message && <p className="text-xs text-rose-600">{errors.message}</p>}
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting}
                   id="contact-form-submit-btn"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#161514] hover:bg-[#2C2925] text-[#FAF8F5] font-sans font-medium text-xs disabled:opacity-50 transition-colors cursor-pointer shadow-xs"
+                  className="btn btn-md btn-primary w-full sm:w-auto"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-zinc-200/40 border-t-zinc-200 rounded-full animate-spin" />
-                      <span>Dispatching...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Send Dispatch</span>
-                    </>
-                  )}
+                  <Send className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Send message</span>
                 </button>
               </form>
 

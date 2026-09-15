@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { 
   Code, 
-  Layout, 
+  Monitor, 
   Server, 
+  BrainCircuit,
   Cloud, 
+  Cpu,
   Search,
-  Cpu
+  type LucideIcon
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SkillCategory } from '../types';
@@ -14,11 +16,18 @@ interface SkillsSectionProps {
   categories: SkillCategory[];
 }
 
+const categoryIcons: Record<string, LucideIcon> = {
+  'Programming Languages': Code,
+  'Web Development': Monitor,
+  'Backend & Databases': Server,
+  'AI/LLM & Data': BrainCircuit,
+  'Cloud & DevOps': Cloud,
+  'CS Fundamentals': Cpu,
+};
+
 export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const [skillSearch, setSkillSearch] = useState('');
-
-  const categoryIcons = [Code, Layout, Server, Cloud];
 
   const allSkills = categories.flatMap(cat => cat.skills);
   const totalSkills = allSkills.length;
@@ -33,22 +42,22 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
   return (
     <section 
       id="skills" 
-      className="py-20 md:py-28 border-t border-[#E5DFD6] relative overflow-hidden text-left"
+      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container-page">
         
         {/* Section Editorial Header */}
-        <div className="flex items-center justify-between pb-6 mb-8 border-b border-[#E5DFD6]">
+        <div className="section-rule">
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-[#C88A58] tracking-wider uppercase font-medium">
-              [ 04 / CAPABILITIES & SPECIALIZATIONS ]
+            <span className="type-eyebrow font-medium">
+              [ 04 / Capabilities & Specializations ]
             </span>
-            <span className="text-xs font-mono text-[#80776C] hidden sm:inline">
-              STACK & PROFICIENCY
+            <span className="type-meta hidden sm:inline">
+              Stack & proficiency
             </span>
           </div>
-          <span className="text-xs font-mono text-[#80776C]">
-            {totalSkills} VERIFIED SKILLS
+          <span className="type-meta">
+            {totalSkills} skills · {keySkills} core
           </span>
         </div>
 
@@ -58,32 +67,37 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6"
+          className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6"
         >
-          <div className="max-w-xl space-y-2">
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#161514] tracking-tight">
+          <div className="max-w-2xl space-y-2">
+            <h2 className="type-section">
               Technical Stack & Competencies
             </h2>
-            <p className="text-sm text-[#5C564D] font-sans">
+            <p className="type-body-sm">
               Languages, frameworks, AI/LLM tooling, and cloud services applied across real projects.
             </p>
           </div>
 
           {/* Quick Skill Search */}
           <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#80776C]" />
+            <label htmlFor="skill-search-input" className="sr-only">
+              Search skills
+            </label>
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-faint pointer-events-none" aria-hidden="true" />
             <input
               type="text"
               id="skill-search-input"
               value={skillSearch}
               onChange={(e) => setSkillSearch(e.target.value)}
-              placeholder="Search competencies..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg text-xs font-sans bg-[#FFFFFF] border border-[#E5DFD6] text-[#161514] placeholder-[#80776C] focus:outline-hidden focus:border-[#C88A58] transition-colors shadow-2xs"
+              placeholder="Search skills..."
+              className="input input-sm h-9 pl-9 pr-16"
             />
             {skillSearch && (
               <button
+                type="button"
                 onClick={() => setSkillSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-sans text-[#6E675E] hover:text-[#161514] cursor-pointer"
+                aria-label="Clear skill search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-muted hover:text-ink cursor-pointer"
               >
                 Clear
               </button>
@@ -91,56 +105,61 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
           </div>
         </motion.div>
 
-        {/* Category Selector Tabs */}
+        {/* Category Selector — compact 3 × 2 grid, clear active state */}
         {!skillSearch && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6" role="group" aria-label="Skill categories">
             {categories.map((cat, idx) => {
-              const IconComp = categoryIcons[idx % categoryIcons.length] || Code;
+              const IconComp = categoryIcons[cat.title] || Code;
               const isSelected = activeTab === idx;
               return (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setActiveTab(idx)}
                   id={`skill-tab-${idx}`}
-                  className={`p-4 rounded-xl text-left border transition-all duration-200 flex flex-col justify-between cursor-pointer ${
+                  aria-pressed={isSelected}
+                  className={`flex items-center gap-3 p-4 rounded-lg text-left border transition-colors duration-200 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#FFFFFF] border-[#C8BFB2] text-[#161514] shadow-xs'
-                      : 'bg-[#FAF7F2] border-[#E5DFD6] text-[#5C564D] hover:border-[#C8BFB2] hover:text-[#161514]'
+                      ? 'bg-surface border-accent shadow-xs'
+                      : 'bg-surface border-line hover:border-line-strong'
                   }`}
                 >
-                  <div className="flex items-center justify-between w-full mb-3">
-                    <div className={`p-2 rounded-lg border border-[#E5DFD6] ${isSelected ? 'bg-[#FAF7F2] text-[#C88A58]' : 'bg-[#FFFFFF] text-[#6E675E]'}`}>
-                      <IconComp className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-[11px] font-mono text-[#80776C]">
+                  <span className={`p-2 rounded-lg border shrink-0 ${isSelected ? 'bg-accent/10 border-accent/30 text-accent' : 'bg-surface border-line text-muted'}`}>
+                    <IconComp className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className={`block text-sm font-semibold tracking-normal ${isSelected ? 'text-ink' : 'text-body'}`}>
+                      {cat.title}
+                    </span>
+                    <span className="type-meta">
                       {cat.skills.length} skills
                     </span>
-                  </div>
-                  <div>
-                    <h3 className={`text-xs font-mono uppercase tracking-wider ${isSelected ? 'text-[#161514] font-semibold' : 'text-[#5C564D]'}`}>
-                      {cat.title}
-                    </h3>
-                  </div>
+                  </span>
                 </button>
               );
             })}
           </div>
         )}
 
-        {/* Active Category Description Header */}
+        {/* Active Category Header — names the category so context is immediate */}
         {!skillSearch && (
-          <div className="mb-6 p-4 rounded-xl bg-[#FAF7F2] border border-[#E5DFD6] flex items-center justify-between shadow-2xs">
-            <p className="text-xs text-[#5C564D] font-sans">
-              {currentCategory.description}
-            </p>
-            <span className="text-xs text-[#C88A58] font-mono font-medium shrink-0 ml-4">
-              {activeTab + 1} / {categories.length}
+          <div className="panel p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="font-sans text-sm font-semibold text-ink">
+                {currentCategory.title}
+              </h3>
+              <p className="type-body-sm">
+                {currentCategory.description}
+              </p>
+            </div>
+            <span className="type-meta shrink-0" aria-live="polite">
+              Category {activeTab + 1} of {categories.length}
             </span>
           </div>
         )}
 
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* Skills Grid — column count adapts so the last row is never a lone orphan */}
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${displayedSkills.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-3`}>
           {displayedSkills.map((skill, idx) => (
             <motion.div
               key={idx}
@@ -148,51 +167,46 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: (idx % 6) * 0.04 }}
-              className="p-4 rounded-xl bg-[#FFFFFF] border border-[#E5DFD6] hover:border-[#C8BFB2] transition-all duration-200 shadow-2xs hover:shadow-xs"
+              className="card card-hover p-5"
             >
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-sans font-medium text-[#161514]">
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-sans font-medium text-ink">
                     {skill.name}
                   </span>
                   {skill.isKey && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono text-[#B86B35] bg-[#FAF7F2] border border-[#E5DFD6] font-semibold">
+                    <span className="chip-accent px-2 py-0.5">
                       Core
                     </span>
                   )}
                 </div>
-                <span className="text-xs font-mono text-[#80776C] shrink-0">
+                <span className="type-meta shrink-0">
                   {skill.experienceYears}
                 </span>
               </div>
 
-              {/* Progress bar */}
-              <div className="space-y-1.5 mt-2">
-                <div className="w-full h-1.5 rounded-full bg-[#ECE7DF] overflow-hidden">
+              {/* Progress bar (self-assessed) */}
+              <div className="space-y-2">
+                <div
+                  role="progressbar"
+                  aria-valuenow={skill.level}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${skill.name}: self-assessed proficiency ${skill.level}%`}
+                  className="w-full h-2 rounded-full bg-chip overflow-hidden"
+                >
                   <div 
-                    className="h-full rounded-full bg-[#C88A58] transition-all duration-500"
+                    className="h-full rounded-full bg-accent transition-[width] duration-500"
                     style={{ width: `${skill.level}%` }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-[#80776C] font-mono">
-                  <span>Proficiency</span>
-                  <span className="text-[#2E2A25] font-medium">{skill.level}%</span>
+                <div className="flex items-center justify-between type-meta">
+                  <span>Self-assessed</span>
+                  <span className="text-ink-soft font-medium">{skill.level}%</span>
                 </div>
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Summary Footer */}
-        <div className="mt-8 p-4 rounded-xl bg-[#FAF7F2] border border-[#E5DFD6] flex flex-wrap items-center justify-between gap-4 text-xs shadow-2xs">
-          <span className="text-[#5C564D] font-sans">
-            Building across the full stack — from REST APIs and databases to cloud deployments and applied AI systems.
-          </span>
-          <div className="flex items-center gap-3 font-mono text-xs text-[#5C564D]">
-            <span>{totalSkills} Tracked Competencies</span>
-            <span className="text-[#80776C]">•</span>
-            <span className="text-[#C88A58] font-medium">{keySkills} Core Specializations</span>
-          </div>
         </div>
 
       </div>

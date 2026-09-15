@@ -7,6 +7,7 @@ import {
   defaultEducations 
 } from './data/portfolioData';
 import { UserProfile, Project, SkillCategory, Experience, Education } from './types';
+import { MotionConfig } from 'motion/react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Biography } from './components/Biography';
@@ -50,7 +51,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-[#F6F3EE] text-[#161514] selection:bg-[#C88A58]/20 selection:text-[#161514]">
+    <MotionConfig reducedMotion="user">
+    <div className="relative min-h-screen bg-canvas text-ink selection:bg-accent/20 selection:text-ink">
       
       {/* Top Fixed Navigation Bar */}
       <Navbar
@@ -75,7 +77,6 @@ export default function App() {
         {/* 2. Biography & Engineering Principles */}
         <Biography
           profile={profile}
-          educations={educations}
           onOpenResume={() => setIsResumeOpen(true)}
         />
 
@@ -117,6 +118,7 @@ export default function App() {
       />
 
     </div>
+    </MotionConfig>
   );
 }
 

@@ -26,24 +26,24 @@ export const Footer: React.FC<FooterProps> = ({ profile }) => {
           
           {/* Brand & Brief */}
           <div className="space-y-1.5 max-w-sm">
-            <span className="font-serif text-lg text-[#161514]">
+            <span className="font-serif text-base text-ink">
               {profile.name}
             </span>
-            <p className="text-xs text-[#5C564D] font-sans">
+            <p className="type-body-sm">
               {profile.title}. Building full-stack products with applied AI and cloud-native tooling.
             </p>
           </div>
 
           {/* Quick Nav Links */}
-          <div className="flex flex-wrap items-center gap-6 text-xs font-sans text-[#5C564D]">
-            <a href="#about" className="hover:text-[#161514] transition-colors">About</a>
-            <a href="#projects" className="hover:text-[#161514] transition-colors">Projects</a>
-            <a href="#skills" className="hover:text-[#161514] transition-colors">Skills</a>
-            <a href="#experience" className="hover:text-[#161514] transition-colors">Experience</a>
-            <a href="#contact" className="hover:text-[#161514] transition-colors">Contact</a>
-          </div>
+          <nav aria-label="Footer" className="flex flex-wrap items-center gap-6 text-sm font-sans text-muted">
+            <a href="#about" className="hover:text-ink transition-colors">About</a>
+            <a href="#projects" className="hover:text-ink transition-colors">Projects</a>
+            <a href="#skills" className="hover:text-ink transition-colors">Skills</a>
+            <a href="#experience" className="hover:text-ink transition-colors">Experience</a>
+            <a href="#contact" className="hover:text-ink transition-colors">Contact</a>
+          </nav>
 
-          {/* Social Profiles & Scroll To Top */}
+          {/* Social Profiles */}
           <div className="flex items-center gap-2">
             {profile.socialLinks.github && (
               <a
@@ -51,9 +51,9 @@ export const Footer: React.FC<FooterProps> = ({ profile }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="p-2 rounded-lg text-[#5C564D] hover:text-[#161514] bg-[#FFFFFF] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors shadow-2xs"
+                className="btn btn-icon btn-outline"
               >
-                <Github className="w-3.5 h-3.5" />
+                <Github className="w-4 h-4" aria-hidden="true" />
               </a>
             )}
             {profile.socialLinks.linkedin && (
@@ -62,9 +62,9 @@ export const Footer: React.FC<FooterProps> = ({ profile }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="p-2 rounded-lg text-[#5C564D] hover:text-[#161514] bg-[#FFFFFF] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors shadow-2xs"
+                className="btn btn-icon btn-outline"
               >
-                <Linkedin className="w-3.5 h-3.5" />
+                <Linkedin className="w-4 h-4" aria-hidden="true" />
               </a>
             )}
             {profile.socialLinks.twitter && (
@@ -73,32 +73,30 @@ export const Footer: React.FC<FooterProps> = ({ profile }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter / X"
-                className="p-2 rounded-lg text-[#5C564D] hover:text-[#161514] bg-[#FFFFFF] hover:bg-[#EBE6DC] border border-[#E5DFD6] transition-colors shadow-2xs"
+                className="btn btn-icon btn-outline"
               >
-                <Twitter className="w-3.5 h-3.5" />
+                <Twitter className="w-4 h-4" aria-hidden="true" />
               </a>
             )}
-            <button
-              onClick={scrollToTop}
-              id="back-to-top-btn"
-              title="Back to top"
-              aria-label="Back to top"
-              className="p-2 ml-2 rounded-lg bg-[#FFFFFF] hover:bg-[#EBE6DC] text-[#5C564D] hover:text-[#161514] border border-[#E5DFD6] transition-colors cursor-pointer shadow-2xs"
-            >
-              <ArrowUp className="w-3.5 h-3.5" />
-            </button>
           </div>
 
         </div>
 
-        {/* Bottom copyright line */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#80776C] font-mono">
-          <div>
-            © {new Date().getFullYear()} {profile.name}. All rights reserved.
+        {/* Bottom bar: copyright + back-to-top kept separate from social links */}
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-x-3 gap-y-1 type-meta text-center sm:text-left">
+            <span>© {new Date().getFullYear()} {profile.name}. All rights reserved.</span>
+            <span className="hidden sm:inline text-faint" aria-hidden="true">•</span>
+            <span>Built with React, Vite & Tailwind CSS</span>
           </div>
-          <div>
-            Designed with restraint & typographic precision
-          </div>
+          <button
+            onClick={scrollToTop}
+            id="back-to-top-btn"
+            className="btn btn-sm btn-outline"
+          >
+            <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Back to top</span>
+          </button>
         </div>
 
       </div>
