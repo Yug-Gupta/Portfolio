@@ -1,154 +1,144 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
-  ExternalLink, 
-  Github, 
-  ArrowUpRight, 
-  Code2, 
-  LayoutGrid,
-  ListFilter
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import {
+  Search, ExternalLink, Github, ArrowUpRight, ChevronRight,
+  Layers, LayoutGrid, List, X,
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Project, ProjectCategory } from '../types';
-import { ProjectModal } from './ProjectModal';
 import { Card3DTilt } from './Card3DTilt';
+import { ProjectModal } from './ProjectModal';
+import { SectionHeader } from './SectionHeader';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface ProjectsSectionProps {
   projects: Project[];
 }
 
-export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) => {
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>('All');
+export function ProjectsSection({ projects }: ProjectsSectionProps) {
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'index'>('grid');
-  const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
 
-  const categories: ProjectCategory[] = ['All', 'Full Stack', 'Cloud & Systems', 'AI & Tools', 'Web & UI'];
+  // Only show categories that have projects
+  const availableCategories = useMemo(() => {
+    const cats = new Set(projects.map(p => p.category));
+    const allCats: ProjectCategory[] = ['All', ...Array.from(cats) as ProjectCategory[]];
+    return allCats;
+  }, [projects]);
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const matchesCategory = selectedCategory === 'All' || project.category === selectedCategory;
-      const query = searchQuery.toLowerCase().trim();
-      const matchesSearch = 
-        !query ||
-        project.title.toLowerCase().includes(query) ||
-        project.description.toLowerCase().includes(query) ||
-        project.technologies.some(t => t.toLowerCase().includes(query));
-      
-      return matchesCategory && matchesSearch;
-    });
-  }, [projects, selectedCategory, searchQuery]);
+    let result = projects;
+    if (activeCategory !== 'All') {
+      result = result.filter((p) => p.category === activeCategory);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.tagline.toLowerCase().includes(q) ||
+          p.technologies.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [projects, activeCategory, searchQuery]);
 
-  const heroProject = filteredProjects.find(p => p.featured) || filteredProjects[0];
-  const secondaryProjects = filteredProjects.filter(p => p.id !== heroProject?.id);
+  const featuredProject = filteredProjects.find((p) => p.featured);
+  const otherProjects = filteredProjects.filter((p) => !p.featured);
 
-  const openProject = (project: Project) => setActiveModalProject(project);
+  // GSAP scroll entrance
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced || !cardsRef.current) return;
+
+    const ctx = gsap.context(() => {
+      gsap.from('.project-card-reveal', {
+        opacity: 0,
+        y: 40,
+        duration: 0.7,
+        stagger: 0.12,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: cardsRef.current,
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [filteredProjects, viewMode]);
 
   return (
-    <section 
-      id="projects" 
-      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
-    >
-      <div className="container-page">
-        
-        {/* Section Editorial Header */}
-        <div className="section-rule">
-          <div className="flex items-center gap-3">
-            <span className="type-eyebrow font-medium">
-              [ 03 / Selected Architectures ]
-            </span>
-            <span className="type-meta hidden sm:inline">
-              Full-stack apps & applied AI
-            </span>
-          </div>
-          <span className="type-meta">
-            {filteredProjects.length} of {projects.length} shown
-          </span>
-        </div>
+    <section id="projects" ref={sectionRef} className="section-spacing relative overflow-hidden">
+      {/* Background ambient */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-accent/[0.02] blur-[100px]" />
+      </div>
 
-        {/* Section Title */}
-        <motion.div 
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5 }}
-          className="max-w-2xl mb-8 space-y-2"
-        >
-          <h2 className="type-section">
-            Featured Projects & Case Studies
-          </h2>
-          <p className="type-body-sm">
-            Full-stack web applications, GraphRAG knowledge engines, and production AI/LLM systems.
-          </p>
-        </motion.div>
+      <div className="container-wide relative z-10">
+        <SectionHeader
+          number="03"
+          label="Selected Architectures"
+          title="Projects"
+          subtitle="A curated selection of systems I've designed and built — from AI-powered knowledge engines to full-stack platforms."
+          badge={`${filteredProjects.length} of ${projects.length} shown`}
+        />
 
-        {/* Project Controls: filters, view toggle and search in one control bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter projects by category">
-            {categories.map((category) => {
-              const isSelected = selectedCategory === category;
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  id={`filter-category-${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                  aria-pressed={isSelected}
-                  className="filter-chip"
-                >
-                  {category}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            {/* View Mode Switcher */}
-            <div className="segmented shrink-0" role="group" aria-label="Project view mode">
+        {/* Controls */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
+          {/* Category Filters */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {availableCategories.map((cat) => (
               <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                id="projects-view-grid-btn"
-                aria-pressed={viewMode === 'grid'}
-                className="segmented-item"
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`filter-chip cursor-pointer ${activeCategory === cat ? 'filter-chip-active' : ''}`}
               >
-                <LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Cards</span>
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* View Toggle + Search */}
+          <div className="flex items-center gap-3">
+            <div className="segmented">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`segmented-item cursor-pointer ${viewMode === 'grid' ? 'segmented-item-active' : ''}`}
+                aria-label="Grid view"
+              >
+                <LayoutGrid size={14} />
               </button>
               <button
-                type="button"
                 onClick={() => setViewMode('index')}
-                id="projects-view-index-btn"
-                aria-pressed={viewMode === 'index'}
-                className="segmented-item"
+                className={`segmented-item cursor-pointer ${viewMode === 'index' ? 'segmented-item-active' : ''}`}
+                aria-label="List view"
               >
-                <ListFilter className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Index</span>
+                <List size={14} />
               </button>
             </div>
 
-            {/* Search Input */}
-            <div className="relative w-full sm:w-64 shrink-0">
-              <label htmlFor="project-search-input" className="sr-only">
-                Search projects
-              </label>
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-faint pointer-events-none" aria-hidden="true" />
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
               <input
                 type="text"
-                id="project-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search projects..."
-                className="input input-sm h-9 pl-9 pr-16"
+                className="input-sm pl-8 pr-8 w-48 sm:w-56"
               />
               {searchQuery && (
                 <button
-                  type="button"
                   onClick={() => setSearchQuery('')}
-                  aria-label="Clear project search"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-muted hover:text-ink cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-3 hover:text-ink cursor-pointer"
                 >
-                  Clear
+                  <X size={12} />
                 </button>
               )}
             </div>
@@ -156,317 +146,254 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
         </div>
 
         {/* Empty State */}
-        {filteredProjects.length === 0 ? (
-          <div className="py-16 text-center card">
-            <Code2 className="w-8 h-8 mx-auto text-faint mb-2" aria-hidden="true" />
-            <h3 className="font-serif text-base text-ink">No projects match query</h3>
-            <p className="text-xs text-muted mt-1 max-w-sm mx-auto font-sans">
-              No matching records found for "{searchQuery}" in "{selectedCategory}".
-            </p>
+        {filteredProjects.length === 0 && (
+          <div className="glass-card-static p-12 text-center">
+            <Layers size={32} className="mx-auto text-ink-3 mb-3" />
+            <p className="type-body">No projects match your current filters.</p>
             <button
-              type="button"
-              onClick={() => {
-                setSelectedCategory('All');
-                setSearchQuery('');
-              }}
-              className="btn btn-sm btn-primary mt-4"
+              onClick={() => { setActiveCategory('All'); setSearchQuery(''); }}
+              className="btn-sm btn-outline mt-4 cursor-pointer"
             >
-              Reset Filters
+              Clear Filters
             </button>
-          </div>
-        ) : viewMode === 'grid' ? (
-          /* Card Case Study Mode */
-          <div className="space-y-8">
-            
-            {/* 1. Flagship Hero System Card */}
-            {heroProject && (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="card card-hover rounded-2xl overflow-hidden shadow-sm hover:shadow-md"
-              >
-                <div className="p-7 sm:p-9 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
-                  
-                  {/* Left 7 cols: Story & Specs */}
-                  <div className="lg:col-span-7 space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="chip-accent">
-                        Featured Project
-                      </span>
-                      <span className="type-meta">
-                        {heroProject.year} • {heroProject.category}
-                      </span>
-                    </div>
-
-                    <h3 className="font-serif text-2xl sm:text-3xl text-ink font-normal tracking-tight">
-                      {heroProject.title}
-                    </h3>
-
-                    <p className="font-mono text-xs text-accent-strong font-medium">
-                      {heroProject.tagline}
-                    </p>
-
-                    <p className="type-body-sm max-w-xl">
-                      {heroProject.description}
-                    </p>
-
-                    {/* Tech Stack Chips */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {heroProject.technologies.map((tech, idx) => (
-                        <span key={idx} className="chip">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-wrap items-center gap-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => openProject(heroProject)}
-                        className="btn btn-sm btn-primary"
-                      >
-                        <span>View Case Study</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                      </button>
-
-                      {heroProject.demoUrl && (
-                        <a
-                          href={heroProject.demoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline"
-                        >
-                          <span>Live Demo</span>
-                          <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-                        </a>
-                      )}
-
-                      {heroProject.githubUrl && (
-                        <a
-                          href={heroProject.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-sm btn-outline"
-                        >
-                          <Github className="w-3.5 h-3.5" aria-hidden="true" />
-                          <span>Source</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right 5 cols: Project Highlights */}
-                  <div className="lg:col-span-5">
-                    <div className="panel p-5 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-mono text-muted pb-2 border-b border-line">
-                        <span className="text-accent font-semibold">
-                          Project Highlights
-                        </span>
-                        <span>At a glance</span>
-                      </div>
-
-                      {heroProject.metrics && heroProject.metrics.map((m, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-surface border border-line shadow-2xs">
-                          <span className="text-xs text-muted font-sans">{m.label}</span>
-                          <span className="font-mono text-sm text-ink font-medium">{m.value}</span>
-                        </div>
-                      ))}
-
-                      <div className="pt-1 flex items-center justify-between text-xs text-faint font-mono">
-                        <span>Production Deployed</span>
-                        <span>CI/CD Backed</span>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </motion.div>
-            )}
-
-            {/* 2. Secondary Systems Grid */}
-            {secondaryProjects.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {secondaryProjects.map((project, idx) => (
-                  <motion.div
-                    key={project.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-30px' }}
-                    transition={{ duration: 0.4, delay: (idx % 3) * 0.08 }}
-                  >
-                    <Card3DTilt
-                      maxTilt={8}
-                      className="h-full card card-hover rounded-xl"
-                    >
-                      <div className="h-full flex flex-col justify-between p-6 text-left">
-                        {/* Clickable body */}
-                        <div 
-                          id={`project-card-${project.id}`}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => openProject(project)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              openProject(project);
-                            }
-                          }}
-                          className="cursor-pointer group flex-1"
-                        >
-                          {/* Card Header Top */}
-                          <div className="flex items-center justify-between gap-2 mb-3">
-                            <span className="chip-accent px-2 py-0.5">
-                              {project.category}
-                            </span>
-                            <span className="type-meta">{project.year}</span>
-                          </div>
-
-                          {/* Project Title */}
-                          <h3 className="font-serif text-xl text-ink group-hover:text-accent transition-colors tracking-tight font-normal">
-                            {project.title}
-                          </h3>
-
-                          {/* Tagline */}
-                          <p className="font-mono text-xs text-muted mt-1 mb-2.5">
-                            {project.tagline}
-                          </p>
-
-                          {/* Description */}
-                          <p className="type-body-sm line-clamp-3 mb-4">
-                            {project.description}
-                          </p>
-
-                          {/* Quick Metric */}
-                          {project.metrics && project.metrics.length > 0 && (
-                            <div className="mb-4 p-2.5 rounded-lg bg-surface-2 border border-line flex items-center justify-between text-xs">
-                              <span className="text-muted font-sans">{project.metrics[0].label}:</span>
-                              <span className="text-ink font-mono font-medium">
-                                {project.metrics[0].value}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Technology Pills */}
-                          <div className="flex flex-wrap gap-1.5 mb-5">
-                            {project.technologies.slice(0, 4).map((tech, tIdx) => (
-                              <span key={tIdx} className="chip px-2 py-0.5">
-                                {tech}
-                              </span>
-                            ))}
-                            {project.technologies.length > 4 && (
-                              <span className="px-1.5 py-0.5 font-mono text-xs text-faint">
-                                +{project.technologies.length - 4}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Card Actions Footer */}
-                        <div className="mt-5 pt-4 border-t border-line flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-                          <button
-                            type="button"
-                            onClick={() => openProject(project)}
-                            id={`view-details-${project.id}`}
-                            className="btn btn-sm btn-primary"
-                          >
-                            <span>View Case Study</span>
-                            <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
-                          </button>
-
-                          <div className="flex items-center gap-3">
-                            {project.githubUrl && (
-                              <a
-                                href={project.githubUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                id={`project-card-github-${project.id}`}
-                                className="inline-flex items-center gap-1 text-xs font-mono text-muted hover:text-ink transition-colors"
-                              >
-                                <Github className="w-3.5 h-3.5" aria-hidden="true" />
-                                <span>Source</span>
-                              </a>
-                            )}
-                            {project.demoUrl && (
-                              <a
-                                href={project.demoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                id={`project-card-demo-${project.id}`}
-                                className="inline-flex items-center gap-1 text-xs font-mono text-muted hover:text-ink transition-colors"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-                                <span>Live Demo</span>
-                              </a>
-                            )}
-                          </div>
-                        </div>
-
-                      </div>
-                    </Card3DTilt>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-          </div>
-        ) : (
-          /* Tabular Index View */
-          <div className="card overflow-hidden">
-            <div className="grid grid-cols-12 px-5 py-3 border-b border-line bg-surface-2 text-xs font-mono text-faint">
-              <div className="col-span-1">Year</div>
-              <div className="col-span-4 sm:col-span-3">Project</div>
-              <div className="col-span-3 hidden sm:block">Category</div>
-              <div className="col-span-5 sm:col-span-4">Primary Stack</div>
-              <div className="col-span-2 sm:col-span-1 text-right">Inspect</div>
-            </div>
-
-            <div className="divide-y divide-line">
-              {filteredProjects.map((project) => (
-                <div
-                  key={project.id}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Open ${project.title}`}
-                  onClick={() => openProject(project)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openProject(project);
-                    }
-                  }}
-                  className="grid grid-cols-12 px-5 py-4 items-center text-xs hover:bg-surface-2 transition-colors cursor-pointer group"
-                >
-                  <div className="col-span-1 font-mono text-faint">
-                    {project.year}
-                  </div>
-                  <div className="col-span-4 sm:col-span-3 font-serif text-sm text-ink font-medium group-hover:text-accent transition-colors">
-                    {project.title}
-                  </div>
-                  <div className="col-span-3 hidden sm:block font-mono text-xs text-muted">
-                    {project.category}
-                  </div>
-                  <div className="col-span-5 sm:col-span-4 font-mono text-xs text-body">
-                    {project.technologies.slice(0, 3).join(' • ')}
-                  </div>
-                  <div className="col-span-2 sm:col-span-1 flex justify-end">
-                    <ArrowUpRight className="w-4 h-4 text-faint group-hover:text-accent transition-colors" aria-hidden="true" />
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
+        {/* Grid View */}
+        {viewMode === 'grid' && filteredProjects.length > 0 && (
+          <div ref={cardsRef} className="space-y-8">
+            {/* Featured Project — Cinematic Card */}
+            {featuredProject && (
+              <div className="project-card-reveal">
+                <Card3DTilt maxTilt={4} className="group">
+                  <div
+                    className="glass-card p-6 sm:p-8 lg:p-10 cursor-pointer"
+                    onClick={() => setSelectedProject(featuredProject)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(featuredProject)}
+                    aria-label={`View details for ${featuredProject.title}`}
+                  >
+                    {/* Featured badge */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-2">
+                        <span className="chip-accent">Featured</span>
+                        <span className="chip">{featuredProject.category}</span>
+                        <span className="type-meta">{featuredProject.year}</span>
+                      </div>
+                      <ArrowUpRight size={18} className="text-ink-3 transition-all duration-300 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      {/* Left: Content */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <h3 className="type-subsection text-ink group-hover:text-accent transition-colors duration-300">
+                          {featuredProject.title}
+                        </h3>
+                        <p className="type-body-sm italic text-ink-3">{featuredProject.tagline}</p>
+                        <p className="type-body leading-relaxed">
+                          {featuredProject.description}
+                        </p>
+
+                        {/* Tech Stack */}
+                        <div className="flex flex-wrap gap-1.5 pt-2">
+                          {featuredProject.technologies.map((tech) => (
+                            <span key={tech} className="chip">{tech}</span>
+                          ))}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-3 pt-3">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelectedProject(featuredProject); }}
+                            className="btn-sm btn-primary cursor-pointer"
+                          >
+                            View Case Study
+                            <ChevronRight size={14} />
+                          </button>
+                          {featuredProject.demoUrl && (
+                            <a
+                              href={featuredProject.demoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="btn-sm btn-outline"
+                            >
+                              <ExternalLink size={13} /> Live Demo
+                            </a>
+                          )}
+                          {featuredProject.githubUrl && (
+                            <a
+                              href={featuredProject.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="btn-sm btn-ghost"
+                            >
+                              <Github size={13} /> Source
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right: Highlights */}
+                      <div className="lg:col-span-5">
+                        <div className="panel p-5 space-y-4">
+                          <h4 className="type-label flex items-center gap-2">
+                            <Layers size={14} className="text-accent" />
+                            Project Highlights
+                          </h4>
+                          <ul className="space-y-2.5">
+                            {featuredProject.features.slice(0, 5).map((feature, i) => (
+                              <li key={i} className="flex items-start gap-2.5 type-body-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                          {featuredProject.metrics && (
+                            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-line">
+                              {featuredProject.metrics.slice(0, 4).map((metric, mIdx) => (
+                                <div key={mIdx} className="space-y-0.5">
+                                  <div className="font-serif text-lg font-medium text-ink">{metric.value}</div>
+                                  <div className="type-meta">{metric.label}</div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card3DTilt>
+              </div>
+            )}
+
+            {/* Secondary Projects Grid */}
+            {otherProjects.length > 0 && (
+              <div className={`grid grid-cols-1 ${otherProjects.length === 1 ? 'md:grid-cols-1 max-w-2xl' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
+                {otherProjects.map((project) => (
+                  <div key={project.id} className="project-card-reveal">
+                    <Card3DTilt maxTilt={6} className="h-full group">
+                      <div
+                        className="glass-card p-5 sm:p-6 h-full flex flex-col cursor-pointer"
+                        onClick={() => setSelectedProject(project)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(project)}
+                        aria-label={`View details for ${project.title}`}
+                      >
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="chip">{project.category}</span>
+                            <span className="type-meta">{project.year}</span>
+                          </div>
+                          <ArrowUpRight size={16} className="text-ink-3 transition-all duration-300 group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        </div>
+
+                        {/* Content */}
+                        <h3 className="type-title text-ink mb-1.5 group-hover:text-accent transition-colors duration-300">
+                          {project.title}
+                        </h3>
+                        <p className="type-meta italic mb-3">{project.tagline}</p>
+                        <p className="type-body-sm flex-1 mb-4 line-clamp-3">{project.description}</p>
+
+                        {/* Tech stack */}
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {project.technologies.slice(0, 5).map((tech) => (
+                            <span key={tech} className="chip text-[10px]">{tech}</span>
+                          ))}
+                          {project.technologies.length > 5 && (
+                            <span className="chip text-[10px]">+{project.technologies.length - 5}</span>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 pt-3 border-t border-line">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSelectedProject(project); }}
+                            className="btn-sm btn-outline flex-1 cursor-pointer"
+                          >
+                            Case Study
+                          </button>
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="btn-icon"
+                              aria-label="View source code"
+                            >
+                              <Github size={15} />
+                            </a>
+                          )}
+                          {project.demoUrl && (
+                            <a
+                              href={project.demoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="btn-icon"
+                              aria-label="View live demo"
+                            >
+                              <ExternalLink size={15} />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </Card3DTilt>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Index View */}
+        {viewMode === 'index' && filteredProjects.length > 0 && (
+          <div ref={cardsRef} className="glass-card-static overflow-hidden">
+            {/* Header */}
+            <div className="grid grid-cols-12 px-5 py-3 border-b border-line type-eyebrow">
+              <div className="col-span-1">Year</div>
+              <div className="col-span-4 sm:col-span-5">Project</div>
+              <div className="col-span-3 hidden sm:block">Category</div>
+              <div className="col-span-3 hidden sm:block">Stack</div>
+              <div className="col-span-1" />
+            </div>
+            {/* Rows */}
+            {filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                className="project-card-reveal grid grid-cols-12 px-5 py-4 items-center border-b border-line last:border-b-0 cursor-pointer transition-colors duration-200 hover:bg-surface-2 group"
+                onClick={() => setSelectedProject(project)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedProject(project)}
+              >
+                <div className="col-span-1 type-meta">{project.year}</div>
+                <div className="col-span-9 sm:col-span-5">
+                  <div className="type-label group-hover:text-accent transition-colors duration-200">{project.title}</div>
+                  <div className="type-meta mt-0.5 sm:hidden">{project.category}</div>
+                </div>
+                <div className="col-span-3 hidden sm:block type-body-sm">{project.category}</div>
+                <div className="col-span-3 hidden sm:flex flex-wrap gap-1">
+                  {project.technologies.slice(0, 3).map((t) => (
+                    <span key={t} className="chip text-[10px]">{t}</span>
+                  ))}
+                </div>
+                <div className="col-span-2 sm:col-span-1 flex justify-end">
+                  <ArrowUpRight size={16} className="text-ink-3 group-hover:text-accent transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Project Case Study Deep Dive Modal */}
-      <ProjectModal
-        project={activeModalProject}
-        onClose={() => setActiveModalProject(null)}
-      />
+      {/* Project Modal */}
+      <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
     </section>
   );
-};
+}

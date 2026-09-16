@@ -1,215 +1,209 @@
-import React, { useState } from 'react';
-import { 
-  Code, 
-  Monitor, 
-  Server, 
-  BrainCircuit,
-  Cloud, 
-  Cpu,
-  Search,
-  type LucideIcon
-} from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { Search, X, Star, Code, Database, Cloud, Brain, Cpu, Globe } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SkillCategory } from '../types';
+import { SectionHeader } from './SectionHeader';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface SkillsSectionProps {
   categories: SkillCategory[];
 }
 
-const categoryIcons: Record<string, LucideIcon> = {
-  'Programming Languages': Code,
-  'Web Development': Monitor,
-  'Backend & Databases': Server,
-  'AI/LLM & Data': BrainCircuit,
-  'Cloud & DevOps': Cloud,
-  'CS Fundamentals': Cpu,
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  'Programming Languages': <Code size={16} />,
+  'Web Development': <Globe size={16} />,
+  'Backend & Databases': <Database size={16} />,
+  'AI/LLM & Data': <Brain size={16} />,
+  'Cloud & DevOps': <Cloud size={16} />,
+  'CS Fundamentals': <Cpu size={16} />,
 };
 
-export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
-  const [activeTab, setActiveTab] = useState<number>(0);
-  const [skillSearch, setSkillSearch] = useState('');
+export function SkillsSection({ categories }: SkillsSectionProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const skillsGridRef = useRef<HTMLDivElement>(null);
 
-  const allSkills = categories.flatMap(cat => cat.skills);
+  const isSearching = searchQuery.trim().length > 0;
+
+  const allSkills = useMemo(() => {
+    return categories.flatMap((cat) =>
+      cat.skills.map((skill) => ({ ...skill, categoryName: cat.title }))
+    );
+  }, [categories]);
+
+  const displayedSkills = useMemo(() => {
+    if (isSearching) {
+      const q = searchQuery.toLowerCase();
+      return allSkills.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.categoryName.toLowerCase().includes(q)
+      );
+    }
+    return categories[activeIndex]?.skills || [];
+  }, [categories, activeIndex, searchQuery, isSearching, allSkills]);
+
   const totalSkills = allSkills.length;
-  const keySkills = allSkills.filter(s => s.isKey).length;
+  const coreSkills = allSkills.filter((s) => s.isKey).length;
 
-  const currentCategory = categories[activeTab] || categories[0];
+  // Animate skill bars on scroll
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced || !skillsGridRef.current) return;
 
-  const displayedSkills = skillSearch.trim()
-    ? allSkills.filter(s => s.name.toLowerCase().includes(skillSearch.toLowerCase().trim()))
-    : currentCategory.skills;
+    const ctx = gsap.context(() => {
+      gsap.from('.skill-card-item', {
+        opacity: 0,
+        y: 24,
+        duration: 0.5,
+        stagger: 0.04,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: skillsGridRef.current,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      });
+    }, skillsGridRef);
+
+    return () => ctx.revert();
+  }, [activeIndex, searchQuery]);
 
   return (
-    <section 
-      id="skills" 
-      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
-    >
-      <div className="container-page">
-        
-        {/* Section Editorial Header */}
-        <div className="section-rule">
-          <div className="flex items-center gap-3">
-            <span className="type-eyebrow font-medium">
-              [ 04 / Capabilities & Specializations ]
-            </span>
-            <span className="type-meta hidden sm:inline">
-              Stack & proficiency
-            </span>
-          </div>
-          <span className="type-meta">
-            {totalSkills} skills · {keySkills} core
-          </span>
-        </div>
+    <section id="skills" className="section-spacing relative overflow-hidden">
+      <div className="container-wide relative z-10">
+        <SectionHeader
+          number="04"
+          label="Capabilities & Specializations"
+          title="Technical Skills"
+          subtitle="Technologies and tools I work with daily, organized by domain expertise."
+          badge={`${totalSkills} skills · ${coreSkills} core`}
+        />
 
-        {/* Section Title & Search */}
-        <motion.div 
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6"
-        >
-          <div className="max-w-2xl space-y-2">
-            <h2 className="type-section">
-              Technical Stack & Competencies
-            </h2>
-            <p className="type-body-sm">
-              Languages, frameworks, AI/LLM tooling, and cloud services applied across real projects.
-            </p>
-          </div>
-
-          {/* Quick Skill Search */}
-          <div className="relative w-full md:w-64">
-            <label htmlFor="skill-search-input" className="sr-only">
-              Search skills
-            </label>
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-faint pointer-events-none" aria-hidden="true" />
+        {/* Search */}
+        <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="relative flex-1 max-w-xs">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
             <input
               type="text"
-              id="skill-search-input"
-              value={skillSearch}
-              onChange={(e) => setSkillSearch(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search skills..."
-              className="input input-sm h-9 pl-9 pr-16"
+              className="input-sm pl-8 pr-8 w-full"
             />
-            {skillSearch && (
+            {searchQuery && (
               <button
-                type="button"
-                onClick={() => setSkillSearch('')}
-                aria-label="Clear skill search"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-muted hover:text-ink cursor-pointer"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-3 hover:text-ink cursor-pointer"
               >
-                Clear
+                <X size={12} />
               </button>
             )}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Category Selector — compact 3 × 2 grid, clear active state */}
-        {!skillSearch && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6" role="group" aria-label="Skill categories">
-            {categories.map((cat, idx) => {
-              const IconComp = categoryIcons[cat.title] || Code;
-              const isSelected = activeTab === idx;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setActiveTab(idx)}
-                  id={`skill-tab-${idx}`}
-                  aria-pressed={isSelected}
-                  className={`flex items-center gap-3 p-4 rounded-lg text-left border transition-colors duration-200 cursor-pointer ${
-                    isSelected
-                      ? 'bg-surface border-accent shadow-xs'
-                      : 'bg-surface border-line hover:border-line-strong'
-                  }`}
-                >
-                  <span className={`p-2 rounded-lg border shrink-0 ${isSelected ? 'bg-accent/10 border-accent/30 text-accent' : 'bg-surface border-line text-muted'}`}>
-                    <IconComp className="w-4 h-4" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className={`block text-sm font-semibold tracking-normal ${isSelected ? 'text-ink' : 'text-body'}`}>
-                      {cat.title}
-                    </span>
-                    <span className="type-meta">
-                      {cat.skills.length} skills
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
+        {/* Category Tabs */}
+        {!isSearching && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-8">
+            {categories.map((cat, idx) => (
+              <button
+                key={cat.title}
+                onClick={() => setActiveIndex(idx)}
+                className={`glass-card-static p-3 text-left cursor-pointer transition-all duration-300 group ${
+                  activeIndex === idx
+                    ? 'border-accent/30 bg-accent/[0.06]'
+                    : 'hover:border-line-strong hover:bg-glass-hover'
+                }`}
+              >
+                <div className={`mb-2 ${activeIndex === idx ? 'text-accent' : 'text-ink-3 group-hover:text-ink-2'} transition-colors duration-200`}>
+                  {CATEGORY_ICONS[cat.title] || <Code size={16} />}
+                </div>
+                <div className={`text-xs font-medium leading-tight ${activeIndex === idx ? 'text-ink' : 'text-ink-2'}`}>
+                  {cat.title}
+                </div>
+                <div className="type-meta mt-1">{cat.skills.length} skills</div>
+              </button>
+            ))}
           </div>
         )}
 
-        {/* Active Category Header — names the category so context is immediate */}
-        {!skillSearch && (
+        {/* Active Category Info */}
+        {!isSearching && categories[activeIndex] && (
           <div className="panel p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="font-sans text-sm font-semibold text-ink">
-                {currentCategory.title}
-              </h3>
-              <p className="type-body-sm">
-                {currentCategory.description}
-              </p>
+            <div className="flex items-center gap-2">
+              <span className="text-accent">{CATEGORY_ICONS[categories[activeIndex].title]}</span>
+              <span className="type-label">{categories[activeIndex].title}</span>
+              {categories[activeIndex].description && (
+                <span className="type-body-sm hidden sm:inline">— {categories[activeIndex].description}</span>
+              )}
             </div>
-            <span className="type-meta shrink-0" aria-live="polite">
-              {currentCategory.title} · {activeTab + 1} of {categories.length}
+            <span className="type-meta">
+              {displayedSkills.length} of {categories[activeIndex].skills.length}
             </span>
           </div>
         )}
 
-        {/* Skills Grid — column count adapts so the last row is never a lone orphan */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${displayedSkills.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-3`}>
+        {/* Search Results Info */}
+        {isSearching && (
+          <div className="panel p-4 mb-6">
+            <span className="type-body-sm">
+              {displayedSkills.length > 0
+                ? `Found ${displayedSkills.length} skill${displayedSkills.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                : `No skills found matching "${searchQuery}"`
+              }
+            </span>
+          </div>
+        )}
+
+        {/* Skills Grid */}
+        <div
+          ref={skillsGridRef}
+          className={`grid grid-cols-1 sm:grid-cols-2 ${
+            displayedSkills.length % 3 === 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'
+          } gap-3`}
+        >
           {displayedSkills.map((skill, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: (idx % 6) * 0.04 }}
-              className="card card-hover p-5"
+            <div
+              key={`${skill.name}-${idx}`}
+              className="skill-card-item glass-card-static p-4 space-y-2.5"
             >
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-sans font-medium text-ink">
-                    {skill.name}
-                  </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="type-label">{skill.name}</span>
                   {skill.isKey && (
-                    <span className="chip-accent px-2 py-0.5">
-                      Core
-                    </span>
+                    <Star size={12} className="text-accent fill-accent" />
                   )}
                 </div>
-                <span className="type-meta shrink-0">
-                  {skill.experienceYears}
-                </span>
+                <span className="type-meta">{skill.experienceYears}y exp</span>
               </div>
 
-              {/* Progress bar (self-assessed) */}
-              <div className="space-y-2">
+              {/* Progress bar */}
+              <div className="space-y-1">
                 <div
+                  className="h-1.5 rounded-full overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.06)' }}
                   role="progressbar"
                   aria-valuenow={skill.level}
                   aria-valuemin={0}
                   aria-valuemax={100}
-                  aria-label={`${skill.name}: self-assessed proficiency ${skill.level}%`}
-                  className="w-full h-2 rounded-full bg-chip overflow-hidden"
+                  aria-label={`${skill.name} proficiency: ${skill.level}%`}
                 >
-                  <div 
-                    className="h-full rounded-full bg-accent transition-[width] duration-500"
-                    style={{ width: `${skill.level}%` }}
+                  <div
+                    className="h-full rounded-full transition-[width] duration-700 ease-out"
+                    style={{
+                      width: `${skill.level}%`,
+                      background: 'linear-gradient(90deg, var(--color-accent), var(--color-accent-hover))',
+                    }}
                   />
                 </div>
-                <div className="flex items-center justify-between type-meta">
-                  <span>Self-assessed</span>
-                  <span className="text-ink-soft font-medium">{skill.level}%</span>
-                </div>
+                <div className="type-meta text-right">{skill.level}%</div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
-
       </div>
     </section>
   );
-};
+}

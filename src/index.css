@@ -1,203 +1,547 @@
 @import "tailwindcss";
 
-/* ---------------------------------------------------------------------------
-   Design tokens
-   Single source of truth for colour, type and surfaces. Prefer the generated
-   utilities (bg-surface, text-body, border-line, ...) over raw hex values.
---------------------------------------------------------------------------- */
+/* ============================================================
+   DESIGN TOKENS — Premium Dark Developer Portfolio
+   ============================================================ */
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Typography — editorial trio */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
-  --color-canvas: #F6F3EE;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #FAF7F2;
-  --color-chip: #ECE7DF;
-  --color-ink: #161514;
-  --color-ink-soft: #2C2925;
-  --color-body: #4A453E;
-  --color-muted: #5C564D;
-  --color-faint: #6B6358;
-  --color-line: #E5DFD6;
-  --color-line-strong: #C8BFB2;
-  --color-accent: #A0622E;
-  --color-accent-strong: #8B4F1F;
+  /* ── Dark Palette with Warm Undertones ── */
+  --color-canvas: #09090B;
+  --color-surface: #111114;
+  --color-surface-2: #18181C;
+  --color-surface-3: #1F1F24;
+  --color-surface-hover: #26262C;
+
+  --color-ink: #EAEAED;
+  --color-ink-2: #9B9BA4;
+  --color-ink-3: #5E5E67;
+
+  --color-accent: #D4915A;
+  --color-accent-hover: #E8A96E;
+  --color-accent-muted: rgba(212, 145, 90, 0.15);
+  --color-accent-subtle: rgba(212, 145, 90, 0.08);
+
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.12);
+
+  --color-glass: rgba(255, 255, 255, 0.03);
+  --color-glass-hover: rgba(255, 255, 255, 0.06);
+  --color-glass-border: rgba(255, 255, 255, 0.07);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.14);
+
+  --color-chip: rgba(255, 255, 255, 0.06);
+  --color-chip-hover: rgba(255, 255, 255, 0.10);
+
+  --color-success: #34D399;
+  --color-destructive: #EF4444;
+  --color-ring: rgba(212, 145, 90, 0.5);
+
+  /* ── Spacing Scale (8px rhythm) ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* ── Radius ── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Shadows (dark-optimized) ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 50px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(212, 145, 90, 0.15);
+  --shadow-glow-lg: 0 0 40px rgba(212, 145, 90, 0.2);
+
+  /* ── Motion ── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
 }
 
+/* ============================================================
+   BASE LAYER
+   ============================================================ */
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+
   html {
-    -webkit-text-size-adjust: 100%;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    font-family: var(--font-sans);
-    overflow-x: hidden;
     background-color: var(--color-canvas);
     color: var(--color-ink);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    overflow-x: hidden;
   }
 
-  h1, h2, h3, h4, .font-serif, .font-display {
+  /* Headings default to serif for editorial feel */
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
     letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--color-ink);
   }
 
-  code, pre, .font-mono {
+  /* Monospace elements */
+  code, pre, kbd, samp {
     font-family: var(--font-mono);
   }
 
-  /* Single, consistent keyboard focus treatment across the whole app. */
+  /* Links */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Focus visible — premium accent ring */
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--color-accent-muted);
+    color: var(--color-ink);
+  }
+
+  /* Custom scrollbar — dark themed */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 3px;
   }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
+/* ============================================================
+   COMPONENT LAYER
+   ============================================================ */
 @layer components {
-  /* --- Layout ------------------------------------------------------------ */
+
+  /* ── Layout Containers ── */
+  .container-wide {
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    padding-left: clamp(1.5rem, 5vw, 3rem);
+    padding-right: clamp(1.5rem, 5vw, 3rem);
+  }
+
   .container-page {
-    @apply max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 10;
+    padding-left: clamp(1.5rem, 5vw, 3rem);
+    padding-right: clamp(1.5rem, 5vw, 3rem);
   }
 
-  /* --- Type scale --------------------------------------------------------
-     Nine sizes total: display, section, subsection, title, body, body-sm,
-     meta/label (12px) and the serif display numeral used in stats.
-  ------------------------------------------------------------------------ */
+  .container-text {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  /* ── Section Spacing ── */
+  .section-spacing {
+    @apply py-20 md:py-28 lg:py-36;
+  }
+
+  .section-spacing-sm {
+    @apply py-14 md:py-20 lg:py-24;
+  }
+
+  /* ── Typography Scale ── */
   .type-display {
-    @apply font-serif text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-ink leading-[1.05];
+    @apply font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight;
+    line-height: 1.05;
   }
+
   .type-section {
-    @apply font-serif text-3xl sm:text-4xl font-normal tracking-tight text-ink leading-tight;
+    @apply font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight;
+    line-height: 1.1;
   }
+
   .type-subsection {
-    @apply font-serif text-2xl font-normal tracking-tight text-ink;
+    @apply font-serif text-2xl sm:text-3xl font-medium tracking-tight;
+    line-height: 1.15;
   }
+
   .type-title {
-    @apply font-serif text-xl font-normal tracking-tight text-ink;
+    @apply font-sans text-lg sm:text-xl font-semibold tracking-tight;
+    line-height: 1.3;
   }
+
   .type-body {
-    @apply font-sans text-base text-body leading-relaxed;
+    @apply font-sans text-base leading-relaxed;
+    color: var(--color-ink-2);
   }
+
   .type-body-sm {
-    @apply font-sans text-sm text-body leading-relaxed;
+    @apply font-sans text-sm leading-relaxed;
+    color: var(--color-ink-2);
   }
+
   .type-label {
-    @apply font-mono text-xs text-muted tracking-normal;
+    @apply font-sans text-sm font-medium;
+    color: var(--color-ink);
   }
+
   .type-meta {
-    @apply font-mono text-xs text-faint tracking-normal;
+    @apply font-mono text-xs;
+    color: var(--color-ink-3);
   }
+
   .type-eyebrow {
-    @apply font-mono text-xs text-accent tracking-normal;
+    @apply font-mono text-[11px] uppercase tracking-[0.15em] font-medium;
+    color: var(--color-ink-3);
   }
 
-  /* --- Section header rule ---------------------------------------------- */
+  /* ── Section Rule (editorial divider) ── */
   .section-rule {
-    @apply flex items-center justify-between gap-3 pb-5 mb-8 border-b border-line;
+    @apply flex items-center justify-between gap-3 pb-4 mb-10;
+    border-bottom: 1px solid var(--color-line);
   }
 
-  /* --- Surfaces ---------------------------------------------------------- */
+  /* ── Glass Cards ── */
+  .glass-card {
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all var(--duration-normal) var(--ease-out-quart);
+  }
+
+  .glass-card:hover {
+    background: var(--color-glass-hover);
+    border-color: var(--color-glass-border-hover);
+    box-shadow: var(--shadow-md);
+  }
+
+  .glass-card-static {
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* ── Solid Cards (for dark surfaces) ── */
   .card {
-    @apply rounded-xl bg-surface border border-line shadow-2xs transition-colors duration-200;
+    @apply rounded-xl border;
+    background: var(--color-surface);
+    border-color: var(--color-line);
+    box-shadow: var(--shadow-sm);
   }
+
   .card-hover {
-    @apply hover:border-line-strong;
+    @apply rounded-xl border;
+    background: var(--color-surface);
+    border-color: var(--color-line);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-normal) var(--ease-out-quart);
   }
+
+  .card-hover:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-line-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  /* ── Panel ── */
   .panel {
-    @apply rounded-xl bg-surface-2 border border-line;
+    @apply rounded-lg border;
+    background: var(--color-surface);
+    border-color: var(--color-line);
   }
 
-  /* --- Chips ------------------------------------------------------------- */
+  /* ── Chips ── */
   .chip {
-    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-ink-soft bg-surface-2 border border-line;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-sans text-xs font-medium;
+    background: var(--color-chip);
+    color: var(--color-ink-2);
+    transition: all var(--duration-fast) ease;
   }
+
+  .chip:hover {
+    background: var(--color-chip-hover);
+    color: var(--color-ink);
+  }
+
   .chip-accent {
-    @apply inline-flex items-center gap-1 rounded-md px-2.5 py-1 font-mono text-xs font-semibold text-accent-strong bg-surface-2 border border-line;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-sans text-xs font-medium;
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    transition: all var(--duration-fast) ease;
   }
 
-  /* --- Segmented toggle (shared by every view/category switcher) ---------- */
-  .segmented {
-    @apply inline-flex items-center gap-1 p-1 rounded-lg bg-chip border border-[#DFD8CC];
-  }
-  .segmented-item {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 font-sans text-xs text-body border border-transparent transition-colors cursor-pointer hover:text-ink;
-  }
-  .segmented-item[aria-pressed="true"] {
-    @apply bg-surface text-ink border-line font-medium shadow-xs;
+  .chip-accent:hover {
+    background: rgba(212, 145, 90, 0.25);
+    color: var(--color-accent-hover);
   }
 
-  /* --- Filter chip (same height as inputs so rows align) ------------------ */
-  .filter-chip {
-    @apply inline-flex items-center h-9 px-3 rounded-lg border font-sans text-xs transition-colors cursor-pointer;
-  }
-  .filter-chip[aria-pressed="false"] {
-    @apply bg-surface text-ink border-line hover:border-line-strong;
-  }
-  .filter-chip[aria-pressed="true"] {
-    @apply bg-ink text-[#FAF8F5] border-ink font-medium shadow-xs;
-  }
-
-  /* --- Buttons -----------------------------------------------------------
-     Four visual variants (primary, secondary, outline, ghost) + icon-only.
-     Sizes are separate so height stays identical everywhere.
-  ------------------------------------------------------------------------ */
+  /* ── Buttons ── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg font-sans font-medium transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium rounded-lg cursor-pointer;
+    @apply transition-all;
+    transition-duration: var(--duration-normal);
+    transition-timing-function: var(--ease-out-quart);
   }
+
+  .btn:focus-visible {
+    @apply outline-2 outline-offset-2;
+    outline-color: var(--color-accent);
+  }
+
   .btn-sm {
-    @apply px-3 py-1.5 text-xs;
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium rounded-lg cursor-pointer px-3.5 py-1.5 text-xs;
+    transition: all var(--duration-normal) var(--ease-out-quart);
   }
+
   .btn-md {
-    @apply px-4 py-2.5 text-sm;
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium rounded-lg cursor-pointer px-5 py-2.5 text-sm;
+    transition: all var(--duration-normal) var(--ease-out-quart);
   }
+
+  .btn-lg {
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium rounded-lg cursor-pointer px-7 py-3 text-base;
+    transition: all var(--duration-normal) var(--ease-out-quart);
+  }
+
   .btn-primary {
-    @apply bg-ink text-[#FAF8F5] border border-ink hover:bg-ink-soft shadow-xs;
+    background: var(--color-accent);
+    color: #0A0A0B;
+    font-weight: 600;
   }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
   .btn-secondary {
-    @apply bg-chip text-ink border border-line-strong hover:bg-[#E2DBD0];
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
   }
+
+  .btn-secondary:hover {
+    background: var(--color-surface-3);
+    border-color: var(--color-line-strong);
+    transform: translateY(-1px);
+  }
+
   .btn-outline {
-    @apply bg-surface text-ink border border-line hover:border-line-strong;
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-strong);
   }
+
+  .btn-outline:hover {
+    background: var(--color-glass-hover);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
   .btn-ghost {
-    @apply text-body hover:bg-chip hover:text-ink;
+    background: transparent;
+    color: var(--color-ink-2);
   }
+
+  .btn-ghost:hover {
+    background: var(--color-glass-hover);
+    color: var(--color-ink);
+  }
+
   .btn-icon {
-    @apply p-2;
+    @apply inline-flex items-center justify-center gap-2 font-sans font-medium rounded-lg cursor-pointer p-2;
+    background: transparent;
+    color: var(--color-ink-3);
+    transition: all var(--duration-normal) var(--ease-out-quart);
   }
 
-  /* --- Inputs ------------------------------------------------------------ */
+  .btn-icon:hover {
+    background: var(--color-glass-hover);
+    color: var(--color-ink);
+  }
+
+  /* ── Inputs ── */
   .input {
-    @apply w-full rounded-lg bg-surface border border-line text-ink text-sm font-sans transition-colors placeholder:text-faint focus-visible:border-accent;
+    @apply w-full px-4 py-3 rounded-lg font-sans text-sm;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    transition: all var(--duration-fast) ease;
   }
+
+  .input::placeholder {
+    color: var(--color-ink-3);
+  }
+
+  .input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-subtle);
+    outline: none;
+  }
+
   .input-sm {
-    @apply px-3 py-2;
+    @apply w-full px-3 py-2 rounded-lg font-sans text-xs;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    transition: all var(--duration-fast) ease;
+  }
+
+  .input-sm::placeholder {
+    color: var(--color-ink-3);
+  }
+
+  .input-sm:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-subtle);
+    outline: none;
+  }
+
+  /* ── Segmented Control ── */
+  .segmented {
+    @apply inline-flex items-center gap-1 p-1 rounded-lg;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+  }
+
+  .segmented-item {
+    @apply px-3 py-1.5 rounded-md text-xs font-medium font-sans cursor-pointer;
+    color: var(--color-ink-3);
+    transition: all var(--duration-fast) ease;
+  }
+
+  .segmented-item:hover {
+    color: var(--color-ink-2);
+  }
+
+  .segmented-item-active {
+    background: var(--color-surface-3);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── Filter Chips ── */
+  .filter-chip {
+    @apply px-3 py-1.5 rounded-full text-xs font-sans font-medium cursor-pointer;
+    background: transparent;
+    color: var(--color-ink-3);
+    border: 1px solid transparent;
+    transition: all var(--duration-fast) ease;
+  }
+
+  .filter-chip:hover {
+    color: var(--color-ink-2);
+    background: var(--color-glass);
+  }
+
+  .filter-chip-active {
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    border-color: rgba(212, 145, 90, 0.2);
+  }
+
+  /* ── Glow Effects ── */
+  .glow-accent {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-accent-lg {
+    box-shadow: var(--shadow-glow-lg);
+  }
+
+  /* Gradient text helper */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Noise Overlay ── */
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* ── Scroll Progress Bar ── */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
+    z-index: 9998;
+    transform-origin: left;
   }
 }
 
-/* Minimalist scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-canvas);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #D8D2C6;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #BDB6A8;
-}
-
-/* Respect users who prefer reduced motion. */
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
@@ -207,5 +551,17 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+  .noise-overlay,
+  .scroll-progress,
+  #main-navbar {
+    display: none !important;
   }
 }

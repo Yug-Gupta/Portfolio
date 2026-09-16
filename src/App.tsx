@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  defaultProfile, 
-  defaultProjects, 
-  defaultSkillCategories, 
-  defaultExperiences, 
-  defaultEducations 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  defaultProfile,
+  defaultProjects,
+  defaultSkillCategories,
+  defaultExperiences,
+  defaultEducations
 } from './data/portfolioData';
 import { UserProfile, Project, SkillCategory, Experience, Education } from './types';
 import { MotionConfig } from 'motion/react';
@@ -32,6 +32,10 @@ export default function App() {
   // Active section tracking
   const [activeSection, setActiveSection] = useState('hero');
 
+  // Scroll progress
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressRef = useRef<HTMLDivElement>(null);
+
   // Section observer to highlight active nav links
   useEffect(() => {
     const sections = document.querySelectorAll('section[id]');
@@ -50,11 +54,35 @@ export default function App() {
     return () => observer.disconnect();
   }, []);
 
+  // Scroll progress bar
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+      setScrollProgress(progress);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <MotionConfig reducedMotion="user">
     <div className="relative min-h-screen bg-canvas text-ink selection:bg-accent/20 selection:text-ink">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-ink focus:text-[#FAF8F5] focus:font-sans focus:text-sm focus:font-medium focus:shadow-lg">Skip to main content</a>
-      
+      {/* Skip to content */}
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-canvas focus:font-sans focus:text-sm focus:font-medium focus:shadow-lg">Skip to main content</a>
+
+      {/* Scroll Progress Bar */}
+      <div
+        ref={progressRef}
+        className="scroll-progress"
+        style={{ transform: `scaleX(${scrollProgress})` }}
+        aria-hidden="true"
+      />
+
+      {/* Noise texture overlay */}
+      <div className="noise-overlay" aria-hidden="true" />
+
       {/* Top Fixed Navigation Bar */}
       <Navbar
         profile={profile}
@@ -122,5 +150,3 @@ export default function App() {
     </MotionConfig>
   );
 }
-
-

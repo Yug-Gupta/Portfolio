@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Terminal, Activity, CornerDownLeft } from 'lucide-react';
 import { UserProfile, Project } from '../types';
 
@@ -33,6 +33,12 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
     { type: 'system', text: 'yug-portfolio-shell v1.0 [react • node • aws]' },
     { type: 'system', text: 'Type "help" for a list of available commands.' },
   ]);
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll logs
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [logs]);
 
   const handleCommand = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,14 +85,14 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
   };
 
   return (
-    <div className="w-full rounded-2xl bg-surface border border-line overflow-hidden text-left shadow-sm">
+    <div className="w-full rounded-2xl bg-surface border border-line overflow-hidden text-left shadow-md">
       {/* Top Window Bar */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-surface-2 border-b border-line">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 mr-2" aria-hidden="true">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#DCD5C9]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#DCD5C9]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#DCD5C9]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-ink-3/40" />
+            <span className="w-2.5 h-2.5 rounded-full bg-ink-3/40" />
+            <span className="w-2.5 h-2.5 rounded-full bg-ink-3/40" />
           </div>
           <span className="type-meta">yug-gupta-system</span>
         </div>
@@ -97,7 +103,7 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
             type="button"
             onClick={() => setActiveTab('cluster')}
             aria-pressed={activeTab === 'cluster'}
-            className="segmented-item"
+            className={`segmented-item cursor-pointer ${activeTab === 'cluster' ? 'segmented-item-active' : ''}`}
           >
             Topology
           </button>
@@ -105,7 +111,7 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
             type="button"
             onClick={() => setActiveTab('terminal')}
             aria-pressed={activeTab === 'terminal'}
-            className="segmented-item"
+            className={`segmented-item cursor-pointer ${activeTab === 'terminal' ? 'segmented-item-active' : ''}`}
           >
             CLI
           </button>
@@ -116,26 +122,26 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
       <div className="p-4 sm:p-5 min-h-[260px] flex flex-col justify-between bg-surface-2">
         {activeTab === 'cluster' ? (
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs font-mono text-muted pb-2 border-b border-line">
+            <div className="flex items-center justify-between text-xs font-mono text-ink-3 pb-2 border-b border-line">
               <span className="flex items-center gap-1.5 text-accent font-medium">
                 <Activity className="w-3.5 h-3.5" aria-hidden="true" />
                 Stack overview
               </span>
-              <span className="text-faint">Representative architecture</span>
+              <span className="text-ink-3">Representative architecture</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {stackNodes.map((node, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg bg-surface border border-line space-y-1 shadow-2xs"
+                  className="p-3 rounded-lg bg-surface border border-line space-y-1"
                 >
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="font-mono text-ink text-xs font-medium truncate">
                       {node.name}
                     </span>
-                    <span className="text-xs font-mono text-accent-strong font-semibold flex items-center gap-1 shrink-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true" />
+                    <span className="text-xs font-mono text-accent font-semibold flex items-center gap-1 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
                       Active
                     </span>
                   </div>
@@ -162,15 +168,16 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
                   key={idx}
                   className={`whitespace-pre-wrap ${
                     log.type === 'in'
-                      ? 'text-accent-strong font-semibold'
+                      ? 'text-accent font-semibold'
                       : log.type === 'system'
-                      ? 'text-faint'
-                      : 'text-ink-soft'
+                      ? 'text-ink-3'
+                      : 'text-ink-2'
                   }`}
                 >
                   {log.text}
                 </div>
               ))}
+              <div ref={logsEndRef} />
             </div>
 
             {/* Input Line */}
@@ -183,12 +190,12 @@ export const ArchitectureInspector: React.FC<ArchitectureInspectorProps> = ({
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="type 'help', 'projects', 'stats'..."
-                className="flex-1 bg-transparent text-xs font-mono text-ink placeholder:text-faint"
+                className="flex-1 bg-transparent text-xs font-mono text-ink placeholder:text-ink-3 outline-none"
               />
               <button
                 type="submit"
                 aria-label="Run command"
-                className="p-1 rounded text-muted hover:text-ink hover:bg-chip transition-colors cursor-pointer"
+                className="p-1 rounded text-ink-3 hover:text-ink hover:bg-surface-3 transition-colors cursor-pointer"
               >
                 <CornerDownLeft className="w-3.5 h-3.5" aria-hidden="true" />
               </button>

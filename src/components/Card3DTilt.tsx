@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useCallback } from 'react';
 
 interface Card3DTiltProps {
   children: React.ReactNode;
@@ -7,89 +7,76 @@ interface Card3DTiltProps {
   glareEffect?: boolean;
 }
 
-export const Card3DTilt: React.FC<Card3DTiltProps> = ({
+export function Card3DTilt({
   children,
   className = '',
-  maxTilt = 10,
+  maxTilt = 8,
   glareEffect = true,
-}) => {
+}: Card3DTiltProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [transformStyle, setTransformStyle] = useState<string>('');
-  const [dynamicShadow, setDynamicShadow] = useState<string>('');
-  const [glareStyle, setGlareStyle] = useState<{ opacity: number; x: number; y: number }>({
-    opacity: 0,
-    x: 50,
-    y: 50,
-  });
+  const glareRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number>(0);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
+    const glare = glareRef.current;
     if (!card) return;
 
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      const rect = card.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const rotateY = ((e.clientX - centerX) / (rect.width / 2)) * maxTilt;
+      const rotateX = -((e.clientY - centerY) / (rect.height / 2)) * maxTilt;
 
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      card.style.boxShadow = `
+        ${-rotateY * 0.8}px ${rotateX * 0.8}px 30px rgba(0,0,0,0.4),
+        0 8px 32px rgba(0,0,0,0.3)
+      `;
 
-    const rotateX = ((y - centerY) / centerY) * -maxTilt;
-    const rotateY = ((x - centerX) / centerX) * maxTilt;
+      if (glare && glareEffect) {
+        const percentX = ((e.clientX - rect.left) / rect.width) * 100;
+        const percentY = ((e.clientY - rect.top) / rect.height) * 100;
+        glare.style.opacity = '1';
+        glare.style.background = `radial-gradient(circle at ${percentX}% ${percentY}%, rgba(255,255,255,0.06) 0%, transparent 60%)`;
+      }
+    });
+  }, [maxTilt, glareEffect]);
 
-    setTransformStyle(
-      `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
-    );
-
-    // Directional shadow calculation tailored for warm light theme
-    const shadowX = (-rotateY * 1.5).toFixed(1);
-    const shadowY = (rotateX * 1.5 + 10).toFixed(1);
-    const shadowBlur = (Math.abs(rotateX) + Math.abs(rotateY) + 18).toFixed(1);
-    setDynamicShadow(
-      `${shadowX}px ${shadowY}px ${shadowBlur}px -4px rgba(45, 35, 25, 0.12), 0 0 16px rgba(200, 138, 88, 0.08)`
-    );
-
-    if (glareEffect) {
-      setGlareStyle({
-        opacity: 0.3,
-        x: (x / rect.width) * 100,
-        y: (y / rect.height) * 100,
-      });
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setTransformStyle('perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)');
-    setDynamicShadow('');
-    setGlareStyle((prev) => ({ ...prev, opacity: 0 }));
-  };
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    const glare = glareRef.current;
+    if (!card) return;
+    cancelAnimationFrame(rafId.current);
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    if (glare) glare.style.opacity = '0';
+  }, []);
 
   return (
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      className={`relative ${className}`}
       style={{
-        transform: transformStyle,
-        boxShadow: dynamicShadow,
-        transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
         transformStyle: 'preserve-3d',
+        transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        willChange: 'transform',
       }}
-      className={`relative overflow-hidden ${className}`}
     >
-      <div style={{ transform: 'translateZ(8px)' }} className="w-full h-full">
+      <div style={{ transform: 'translateZ(8px)' }}>
         {children}
       </div>
-
-      {/* Warm Spun Bronze / Sunlight Sheen on Tilt */}
       {glareEffect && (
         <div
-          className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-300 z-30"
-          style={{
-            opacity: glareStyle.opacity,
-            background: `radial-gradient(circle 320px at ${glareStyle.x}% ${glareStyle.y}%, rgba(255, 255, 255, 0.6) 0%, rgba(200, 138, 88, 0.18) 40%, transparent 80%)`,
-          }}
+          ref={glareRef}
+          className="pointer-events-none absolute inset-0 rounded-xl"
+          style={{ opacity: 0, transition: 'opacity 0.3s ease' }}
         />
       )}
     </div>
   );
-};
+}

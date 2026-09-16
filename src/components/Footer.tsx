@@ -1,105 +1,87 @@
 import React from 'react';
-import { 
-  Github, 
-  Linkedin, 
-  Twitter, 
-  ArrowUp
-} from 'lucide-react';
+import { ArrowUp, Github, Linkedin, Twitter } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface FooterProps {
   profile: UserProfile;
 }
 
-export const Footer: React.FC<FooterProps> = ({ profile }) => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+const NAV_LINKS = [
+  { id: 'about', label: 'About' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'contact', label: 'Contact' },
+];
+
+export function Footer({ profile }: FooterProps) {
+  const socialLinks = [
+    { icon: <Github size={16} />, url: profile.socialLinks.github, label: 'GitHub' },
+    { icon: <Linkedin size={16} />, url: profile.socialLinks.linkedin, label: 'LinkedIn' },
+    { icon: <Twitter size={16} />, url: profile.socialLinks.twitter, label: 'Twitter' },
+  ].filter((l) => l.url);
 
   return (
-    <footer 
-      id="main-footer"
-      className="border-t border-[#E5DFD6] bg-[#FAF7F2] py-12 text-left relative overflow-hidden"
-    >
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-[#E5DFD6]">
-          
-          {/* Brand & Brief */}
-          <div className="space-y-1.5 max-w-sm">
-            <span className="font-serif text-base text-ink">
-              {profile.name}
-            </span>
-            <p className="type-body-sm">
-              {profile.title}. Building full-stack products with applied AI and cloud-native tooling.
-            </p>
+    <footer id="main-footer" className="border-t border-line py-10 sm:py-12 relative overflow-hidden">
+      <div className="container-wide">
+        {/* Upper row */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-line">
+          {/* Brand */}
+          <div>
+            <div className="font-serif text-lg font-medium text-ink tracking-tight">{profile.name}</div>
+            <div className="type-body-sm mt-0.5">{profile.title}</div>
           </div>
 
-          {/* Quick Nav Links */}
-          <nav aria-label="Footer" className="flex flex-wrap items-center gap-6 text-sm font-sans text-muted">
-            <a href="#about" className="hover:text-ink transition-colors">About</a>
-            <a href="#projects" className="hover:text-ink transition-colors">Projects</a>
-            <a href="#skills" className="hover:text-ink transition-colors">Skills</a>
-            <a href="#experience" className="hover:text-ink transition-colors">Experience</a>
-            <a href="#contact" className="hover:text-ink transition-colors">Contact</a>
+          {/* Navigation */}
+          <nav className="flex items-center gap-4 flex-wrap" aria-label="Footer navigation">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="type-body-sm hover:text-accent transition-colors duration-200"
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
 
-          {/* Social Profiles */}
-          <div className="flex items-center gap-2">
-            {profile.socialLinks.github && (
+          {/* Social */}
+          <div className="flex items-center gap-1.5">
+            {socialLinks.map((link) => (
               <a
-                href={profile.socialLinks.github}
+                key={link.label}
+                href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GitHub"
-                className="btn btn-icon btn-outline"
+                className="btn-icon"
+                aria-label={link.label}
               >
-                <Github className="w-4 h-4" aria-hidden="true" />
+                {link.icon}
               </a>
-            )}
-            {profile.socialLinks.linkedin && (
-              <a
-                href={profile.socialLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="btn btn-icon btn-outline"
-              >
-                <Linkedin className="w-4 h-4" aria-hidden="true" />
-              </a>
-            )}
-            {profile.socialLinks.twitter && (
-              <a
-                href={profile.socialLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter / X"
-                className="btn btn-icon btn-outline"
-              >
-                <Twitter className="w-4 h-4" aria-hidden="true" />
-              </a>
-            )}
+            ))}
           </div>
-
         </div>
 
-        {/* Bottom bar: copyright + back-to-top kept separate from social links */}
+        {/* Lower row */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-center gap-x-3 gap-y-1 type-meta text-center sm:text-left">
-            <span>© {new Date().getFullYear()} {profile.name}. All rights reserved.</span>
-            <span className="hidden sm:inline text-faint" aria-hidden="true">•</span>
-            <span>Built with React, Vite & Tailwind CSS</span>
-          </div>
+          <p className="type-meta">
+            © {new Date().getFullYear()} {profile.name}. Built with React, Three.js & Tailwind CSS.
+          </p>
+
           <button
-            onClick={scrollToTop}
-            id="back-to-top-btn"
-            className="btn btn-sm btn-outline"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="btn-sm btn-ghost group cursor-pointer"
+            aria-label="Back to top"
           >
-            <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Back to top</span>
+            Back to top
+            <ArrowUp size={14} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
           </button>
         </div>
-
       </div>
     </footer>
   );
-};
+}
