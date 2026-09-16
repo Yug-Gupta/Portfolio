@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Logo / Brand */}
@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   key={link.name}
                   href={link.href}
                   id={`nav-link-${link.name.toLowerCase()}`}
-                  aria-current={isActive ? 'true' : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`px-3.5 py-1 rounded-full text-sm font-sans transition-colors duration-200 ${
                     isActive
                       ? 'bg-surface text-ink font-medium shadow-xs'
@@ -98,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="btn btn-sm btn-secondary"
             >
               <FileText className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
-              <span>Resume</span>
+              <span>View Resume</span>
             </button>
 
             {/* Mobile menu toggle */}
@@ -130,7 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  aria-current={isActive ? 'true' : undefined}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`block px-3 py-2 rounded-md text-sm transition-colors ${
                     isActive
                       ? 'bg-chip text-ink font-medium'

@@ -66,7 +66,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
   return (
     <section 
       id="contact" 
-      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
+      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
     >
       <div className="container-page">
         
@@ -276,9 +276,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Your name"
                       aria-invalid={Boolean(errors.name)}
+                      aria-describedby={errors.name ? 'contact-name-error' : undefined}
                       className={`input input-sm ${errors.name ? 'border-rose-500' : ''}`}
                     />
-                    {errors.name && <p className="text-xs text-rose-600">{errors.name}</p>}
+                    {errors.name && <p id="contact-name-error" className="text-xs text-rose-600">{errors.name}</p>}
                   </div>
 
                   {/* Email Input */}
@@ -299,9 +300,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="your@email.com"
                       aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? 'contact-email-error' : undefined}
                       className={`input input-sm ${errors.email ? 'border-rose-500' : ''}`}
                     />
-                    {errors.email && <p className="text-xs text-rose-600">{errors.email}</p>}
+                    {errors.email && <p id="contact-email-error" className="text-xs text-rose-600">{errors.email}</p>}
                   </div>
                 </div>
 
@@ -341,9 +343,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile }) => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Describe your project, role, or questions..."
                     aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? 'contact-message-error' : undefined}
                     className={`input input-sm ${errors.message ? 'border-rose-500' : ''}`}
                   />
-                  {errors.message && <p className="text-xs text-rose-600">{errors.message}</p>}
+                  {errors.message && <p id="contact-message-error" className="text-xs text-rose-600">{errors.message}</p>}
                 </div>
 
                 {/* Submit Button */}

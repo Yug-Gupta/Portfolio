@@ -47,7 +47,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
   return (
     <section 
       id="projects" 
-      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
+      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
     >
       <div className="container-page">
         
@@ -55,7 +55,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
         <div className="section-rule">
           <div className="flex items-center gap-3">
             <span className="type-eyebrow font-medium">
-              [ 02 / Selected Architectures ]
+              [ 03 / Selected Architectures ]
             </span>
             <span className="type-meta hidden sm:inline">
               Full-stack apps & applied AI
@@ -83,7 +83,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
         </motion.div>
 
         {/* Project Controls: filters, view toggle and search in one control bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter projects by category">
             {categories.map((category) => {
               const isSelected = selectedCategory === category;
@@ -398,7 +398,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ projects }) =>
                                 className="inline-flex items-center gap-1 text-xs font-mono text-muted hover:text-ink transition-colors"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-                                <span>Demo</span>
+                                <span>Live Demo</span>
                               </a>
                             )}
                           </div>

@@ -44,7 +44,7 @@ export const Biography: React.FC<BiographyProps> = ({ profile, onOpenResume }) =
   return (
     <section 
       id="about" 
-      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
+      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
     >
       <div className="container-page">
         
@@ -52,7 +52,7 @@ export const Biography: React.FC<BiographyProps> = ({ profile, onOpenResume }) =
         <div className="section-rule">
           <div className="flex items-center gap-3">
             <span className="type-eyebrow font-medium">
-              [ 03 / Philosophy & Background ]
+              [ 02 / Philosophy & Background ]
             </span>
             <span className="type-meta hidden sm:inline">
               Core tenets & engineering foundation
@@ -72,7 +72,7 @@ export const Biography: React.FC<BiographyProps> = ({ profile, onOpenResume }) =
           className="max-w-2xl mb-14 space-y-3"
         >
           <h2 className="type-section">
-            Building reliable software with curiosity, craft, and deliberate purpose.
+            A foundation built on architectural integrity and continuous learning.
           </h2>
           <p className="type-body-sm">
             Bridging full-stack engineering with applied AI and cloud-native tooling.

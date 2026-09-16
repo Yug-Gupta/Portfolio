@@ -16,7 +16,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
   return (
     <section 
       id="experience" 
-      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
+      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
     >
       <div className="container-page">
         

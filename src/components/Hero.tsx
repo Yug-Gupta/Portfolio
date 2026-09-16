@@ -97,7 +97,7 @@ export const Hero: React.FC<HeroProps> = ({
                 className="btn btn-md btn-secondary"
               >
                 <FileText className="w-4 h-4 text-accent" aria-hidden="true" />
-                <span>Resume</span>
+                <span>View Resume</span>
               </button>
 
               <button
@@ -169,7 +169,7 @@ export const Hero: React.FC<HeroProps> = ({
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-14 sm:mt-18 pt-8 border-t border-line grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8"
+          className="mt-12 sm:mt-14 pt-8 border-t border-line grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8"
         >
           {profile.stats.map((stat, idx) => (
             <div key={idx} className="space-y-1">

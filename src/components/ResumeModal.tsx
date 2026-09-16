@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   X, 
   Printer, 
@@ -27,12 +27,15 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({
   educations,
   skillCategories,
 }) => {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setTimeout(() => closeRef.current?.focus(), 50);
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
@@ -78,6 +81,7 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({
               <span>Print / PDF</span>
             </button>
             <button
+              ref={closeRef}
               onClick={onClose}
               id="close-resume-modal-btn"
               aria-label="Close resume"

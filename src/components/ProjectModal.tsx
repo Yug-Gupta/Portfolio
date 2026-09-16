@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   X, 
   ExternalLink, 
@@ -17,12 +17,15 @@ interface ProjectModalProps {
 }
 
 export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     if (project) {
       document.body.style.overflow = 'hidden';
+      setTimeout(() => closeRef.current?.focus(), 50);
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
@@ -49,6 +52,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
       >
         {/* Close Button */}
         <button
+          ref={closeRef}
           onClick={onClose}
           id="project-modal-close-btn"
           aria-label="Close project details"

@@ -42,7 +42,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
   return (
     <section 
       id="skills" 
-      className="py-20 md:py-28 border-t border-line relative overflow-hidden text-left"
+      className="py-16 md:py-24 border-t border-line relative overflow-hidden text-left"
     >
       <div className="container-page">
         
@@ -153,7 +153,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ categories }) => {
               </p>
             </div>
             <span className="type-meta shrink-0" aria-live="polite">
-              Category {activeTab + 1} of {categories.length}
+              {currentCategory.title} · {activeTab + 1} of {categories.length}
             </span>
           </div>
         )}

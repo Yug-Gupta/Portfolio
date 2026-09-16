@@ -21,7 +21,7 @@ export const Footer: React.FC<FooterProps> = ({ profile }) => {
       id="main-footer"
       className="border-t border-[#E5DFD6] bg-[#FAF7F2] py-12 text-left relative overflow-hidden"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-[#E5DFD6]">
           
           {/* Brand & Brief */}

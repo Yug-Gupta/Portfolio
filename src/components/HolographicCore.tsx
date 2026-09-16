@@ -234,7 +234,7 @@ export const HolographicCore: React.FC<HolographicCoreProps> = ({
   }, [size, interactive]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center select-none group">
+    <div className="relative flex flex-col items-center justify-center select-none group" role="img" aria-label="Interactive 3D sculpture — decorative visual">
       {/* Soft warm amber background ambient bloom */}
       <div 
         className={`absolute rounded-full transition-all duration-700 pointer-events-none w-72 h-72 bg-[#C88A58]/15 blur-3xl ${

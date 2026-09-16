@@ -17,12 +17,12 @@
   --color-ink: #161514;
   --color-ink-soft: #2C2925;
   --color-body: #4A453E;
-  --color-muted: #6E675E;
-  --color-faint: #80776C;
+  --color-muted: #5C564D;
+  --color-faint: #6B6358;
   --color-line: #E5DFD6;
   --color-line-strong: #C8BFB2;
-  --color-accent: #C88A58;
-  --color-accent-strong: #B86B35;
+  --color-accent: #A0622E;
+  --color-accent-strong: #8B4F1F;
 }
 
 @layer base {
@@ -59,7 +59,7 @@
 @layer components {
   /* --- Layout ------------------------------------------------------------ */
   .container-page {
-    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10;
+    @apply max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10;
   }
 
   /* --- Type scale --------------------------------------------------------
