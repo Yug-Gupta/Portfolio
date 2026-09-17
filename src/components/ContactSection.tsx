@@ -1,259 +1,277 @@
-import React, { useState } from 'react';
-import {
-  Mail, Copy, Check, ExternalLink, MapPin, Clock,
-  Github, Linkedin, Twitter, Send, AlertCircle,
-} from 'lucide-react';
-import { UserProfile } from '../types';
-import { SectionHeader } from './SectionHeader';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { ArrowUpRight, Check, Copy, Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import type { UserProfile } from '../types';
+import { SectionHeading } from './SectionHeading';
+import { Reveal } from './Reveal';
 
 interface ContactSectionProps {
   profile: UserProfile;
+  onOpenResume: () => void;
 }
 
-interface FormData {
+interface FormState {
   name: string;
   email: string;
   subject: string;
   message: string;
 }
 
-interface FormErrors {
-  name?: string;
-  email?: string;
-  subject?: string;
-  message?: string;
-}
+type FormErrors = Partial<Record<keyof FormState, string>>;
 
-export function ContactSection({ profile }: ContactSectionProps) {
+const EMPTY_FORM: FormState = { name: '', email: '', subject: '', message: '' };
+
+function CopyButton({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
-  const contentRef = useScrollReveal<HTMLDivElement>({ variant: 'fadeUp', stagger: 0.1 });
-
-  const copyEmail = async () => {
+  const copy = async () => {
     try {
-      await navigator.clipboard.writeText(profile.email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      await navigator.clipboard.writeText(value);
     } catch {
-      // Fallback
-      const textArea = document.createElement('textarea');
-      textArea.value = profile.email;
-      document.body.appendChild(textArea);
-      textArea.select();
+      const el = document.createElement('textarea');
+      el.value = value;
+      document.body.appendChild(el);
+      el.select();
       document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      document.body.removeChild(el);
     }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
   };
-
-  const validateForm = (): boolean => {
-    const errors: FormErrors = {};
-    if (!formData.name.trim()) errors.name = 'Name is required';
-    if (!formData.email.trim()) errors.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
-    if (!formData.subject.trim()) errors.subject = 'Subject is required';
-    if (!formData.message.trim()) errors.message = 'Message is required';
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    const mailto = `mailto:${profile.email}?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
-      `From: ${formData.name} (${formData.email})\n\n${formData.message}`
-    )}`;
-    window.location.href = mailto;
-  };
-
-  const updateField = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (formErrors[field]) {
-      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const socialLinks = [
-    { name: 'GitHub', icon: <Github size={18} />, url: profile.socialLinks.github },
-    { name: 'LinkedIn', icon: <Linkedin size={18} />, url: profile.socialLinks.linkedin },
-    { name: 'Twitter / X', icon: <Twitter size={18} />, url: profile.socialLinks.twitter },
-  ].filter((l) => l.url);
 
   return (
-    <section id="contact" className="section-spacing relative overflow-hidden">
-      {/* Background ambient */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-accent/[0.03] blur-[120px]" />
-      </div>
+    <button type="button" onClick={copy} className="btn btn-sm btn-outline">
+      {copied ? (
+        <>
+          <Check size={14} className="text-success" aria-hidden="true" />
+          Copied
+        </>
+      ) : (
+        <>
+          <Copy size={14} aria-hidden="true" />
+          {label}
+        </>
+      )}
+    </button>
+  );
+}
 
-      <div className="container-wide relative z-10">
-        <SectionHeader
-          number="06"
+export function ContactSection({ profile, onOpenResume }: ContactSectionProps) {
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [sent, setSent] = useState(false);
+
+  const update = (field: keyof FormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
+  };
+
+  const validate = () => {
+    const next: FormErrors = {};
+    if (!form.name.trim()) next.name = 'Please add your name';
+    if (!form.email.trim()) next.email = 'Please add your email';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = 'Check the email format';
+    if (!form.subject.trim()) next.subject = 'Please add a subject';
+    if (!form.message.trim()) next.message = 'Please add a message';
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    const body = `From: ${form.name} (${form.email})\n\n${form.message}`;
+    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(
+      form.subject
+    )}&body=${encodeURIComponent(body)}`;
+    setSent(true);
+  };
+
+  const socials = [
+    { label: 'GitHub', href: profile.socialLinks.github, Icon: Github },
+    { label: 'LinkedIn', href: profile.socialLinks.linkedin, Icon: Linkedin },
+  ].filter((s): s is { label: string; href: string; Icon: typeof Github } => Boolean(s.href));
+
+  return (
+    <section id="contact" className="section">
+      <div className="shell">
+        <SectionHeading
+          index="05"
           label="Contact"
-          title="Get in Touch"
-          subtitle="Interested in working together or have a question? I'd love to hear from you."
-          badge="Response < 24h"
+          title="Let's build something worth shipping."
+          intro="I'm open to full-time roles and interesting collaborations. The fastest way to reach me is email — I usually reply within a day or two."
         />
 
-        <div ref={contentRef} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column */}
-          <div className="lg:col-span-5 space-y-4">
-            {/* Email Card */}
-            <div className="glass-card p-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <Mail size={16} className="text-accent" />
-                <span className="type-label">Direct Email</span>
+        <div className="mt-14 grid gap-12 lg:mt-20 lg:grid-cols-12 lg:gap-16">
+          {/* Direct channels */}
+          <div className="lg:col-span-5">
+            <Reveal>
+              <a
+                href={`mailto:${profile.email}`}
+                className="group block border-t border-line pt-6"
+              >
+                <span className="t-label">Email</span>
+                <span className="font-display mt-2 flex items-center gap-2 break-all text-xl font-medium tracking-tight text-ink transition-colors group-hover:text-accent sm:text-2xl">
+                  {profile.email}
+                  <ArrowUpRight
+                    size={18}
+                    className="shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </span>
+              </a>
+            </Reveal>
+
+            <Reveal delay={0.05}>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <CopyButton label="Copy email" value={profile.email} />
+                {profile.phone && <CopyButton label="Copy phone" value={profile.phone} />}
               </div>
-              <div className="flex items-center gap-2">
-                <code className="type-body-sm font-mono flex-1 text-ink">{profile.email}</code>
-                <button
-                  onClick={copyEmail}
-                  className="btn-sm btn-ghost cursor-pointer"
-                  aria-label="Copy email to clipboard"
-                >
-                  {copied ? (
-                    <><Check size={14} className="text-emerald-400" /> Copied</>
-                  ) : (
-                    <><Copy size={14} /> Copy</>
-                  )}
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="panel p-4">
+                  <MapPin size={16} className="text-accent" aria-hidden="true" />
+                  <div className="t-small mt-3 text-ink">{profile.location}</div>
+                </div>
+                <div className="panel p-4">
+                  <Mail size={16} className="text-accent" aria-hidden="true" />
+                  <div className="t-small mt-3 text-ink">{profile.availability}</div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                {socials.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-md btn-outline"
+                  >
+                    <Icon size={15} aria-hidden="true" />
+                    {label}
+                  </a>
+                ))}
+                <button type="button" onClick={onOpenResume} className="btn btn-md btn-outline">
+                  Résumé
                 </button>
               </div>
-              <div className="flex items-center gap-1.5 type-meta">
-                <Clock size={11} /> Typical response: 24–48 hours
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div className="space-y-2">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-card p-4 flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:bg-accent/20 transition-all duration-300">
-                      {link.icon}
-                    </div>
-                    <span className="type-label">{link.name}</span>
-                  </div>
-                  <ExternalLink size={14} className="text-ink-3 group-hover:text-accent transition-colors duration-200" />
-                </a>
-              ))}
-            </div>
-
-            {/* Location */}
-            <div className="glass-card-static p-4 flex items-center gap-3">
-              <MapPin size={16} className="text-accent" />
-              <div>
-                <span className="type-label block">{profile.location}</span>
-                <span className="type-meta">{profile.availability}</span>
-              </div>
-            </div>
+            </Reveal>
           </div>
 
-          {/* Right: Contact Form */}
-          <div className="lg:col-span-7">
-            <div className="glass-card p-6 sm:p-8">
-              <h3 className="type-title mb-5">Send a Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Name */}
-                  <div>
-                    <label htmlFor="contact-name" className="type-label text-xs mb-1.5 block">Name</label>
-                    <input
-                      id="contact-name"
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => updateField('name', e.target.value)}
-                      placeholder="Your name"
-                      className={`input ${formErrors.name ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                    />
-                    {formErrors.name && (
-                      <p className="type-meta text-red-400 mt-1 flex items-center gap-1" role="alert">
-                        <AlertCircle size={11} /> {formErrors.name}
-                      </p>
-                    )}
-                  </div>
+          {/* Message form */}
+          <Reveal delay={0.1} className="lg:col-span-7">
+            <form onSubmit={onSubmit} noValidate className="window p-6 sm:p-8">
+              <div className="marker justify-between">
+                <span>Direct message</span>
+                <span className="text-ink-2">/ mail client</span>
+              </div>
 
-                  {/* Email */}
-                  <div>
-                    <label htmlFor="contact-email" className="type-label text-xs mb-1.5 block">Email</label>
-                    <input
-                      id="contact-email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => updateField('email', e.target.value)}
-                      placeholder="you@example.com"
-                      className={`input ${formErrors.email ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                    />
-                    {formErrors.email && (
-                      <p className="type-meta text-red-400 mt-1 flex items-center gap-1" role="alert">
-                        <AlertCircle size={11} /> {formErrors.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <Field
+                  id="contact-name"
+                  label="Name"
+                  value={form.name}
+                  error={errors.name}
+                  placeholder="Your name"
+                  onChange={(v) => update('name', v)}
+                />
+                <Field
+                  id="contact-email"
+                  label="Email"
+                  type="email"
+                  value={form.email}
+                  error={errors.email}
+                  placeholder="you@company.com"
+                  onChange={(v) => update('email', v)}
+                />
+              </div>
 
-                {/* Subject */}
-                <div>
-                  <label htmlFor="contact-subject" className="type-label text-xs mb-1.5 block">Subject</label>
-                  <input
-                    id="contact-subject"
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) => updateField('subject', e.target.value)}
-                    placeholder="What's this about?"
-                    className={`input ${formErrors.subject ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                  />
-                  {formErrors.subject && (
-                    <p className="type-meta text-red-400 mt-1 flex items-center gap-1" role="alert">
-                      <AlertCircle size={11} /> {formErrors.subject}
-                    </p>
-                  )}
-                </div>
+              <div className="mt-5">
+                <Field
+                  id="contact-subject"
+                  label="Subject"
+                  value={form.subject}
+                  error={errors.subject}
+                  placeholder="What is this about?"
+                  onChange={(v) => update('subject', v)}
+                />
+              </div>
 
-                {/* Message */}
-                <div>
-                  <label htmlFor="contact-message" className="type-label text-xs mb-1.5 block">Message</label>
-                  <textarea
-                    id="contact-message"
-                    value={formData.message}
-                    onChange={(e) => updateField('message', e.target.value)}
-                    placeholder="Tell me about your project or question..."
-                    rows={5}
-                    className={`input resize-none ${formErrors.message ? 'border-red-500/50 focus:border-red-500' : ''}`}
-                  />
-                  {formErrors.message && (
-                    <p className="type-meta text-red-400 mt-1 flex items-center gap-1" role="alert">
-                      <AlertCircle size={11} /> {formErrors.message}
-                    </p>
-                  )}
-                </div>
+              <div className="mt-5">
+                <label htmlFor="contact-message" className="t-label block">
+                  Message
+                </label>
+                <textarea
+                  id="contact-message"
+                  rows={5}
+                  value={form.message}
+                  placeholder="A little context helps me reply well."
+                  onChange={(e) => update('message', e.target.value)}
+                  aria-invalid={Boolean(errors.message)}
+                  aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                  className={`field mt-2 resize-none ${errors.message ? 'field-error' : ''}`}
+                />
+                {errors.message && (
+                  <p id="contact-message-error" role="alert" className="t-mono mt-2 text-[0.6875rem] text-danger">
+                    {errors.message}
+                  </p>
+                )}
+              </div>
 
-                <button type="submit" className="btn-md btn-primary w-full cursor-pointer">
-                  <Send size={16} /> Send Message
+              <div className="mt-7 flex flex-wrap items-center gap-4">
+                <button type="submit" className="btn btn-lg btn-primary">
+                  <Mail size={15} aria-hidden="true" />
+                  Send message
                 </button>
-                <p className="type-meta text-center">
-                  Opens your email client with a pre-filled draft.
+                <p className="t-mono text-[0.6875rem] text-ink-3">
+                  {sent ? 'Opening your mail client…' : 'Opens a draft in your mail client.'}
                 </p>
-              </form>
-            </div>
-          </div>
+              </div>
+            </form>
+          </Reveal>
         </div>
       </div>
     </section>
+  );
+}
+
+interface FieldProps {
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+  error?: string;
+  type?: string;
+}
+
+function Field({ id, label, value, placeholder, onChange, error, type = 'text' }: FieldProps) {
+  const errorId = `${id}-error`;
+  return (
+    <div>
+      <label htmlFor={id} className="t-label block">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={`field mt-2 ${error ? 'field-error' : ''}`}
+      />
+      {error && (
+        <p id={errorId} role="alert" className="t-mono mt-2 text-[0.6875rem] text-danger">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

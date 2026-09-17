@@ -1,169 +1,147 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
-import { gsap } from 'gsap';
-import { UserProfile, Project } from '../types';
-import { HolographicCore } from './HolographicCore';
-import { ArchitectureInspector } from './ArchitectureInspector';
+import { motion, useReducedMotion } from 'motion/react';
+import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from 'lucide-react';
+import type { UserProfile } from '../types';
+import { ProfileConsole } from './ProfileConsole';
 
 interface HeroProps {
   profile: UserProfile;
-  projects?: Project[];
   onOpenResume: () => void;
-  onOpenContact: () => void;
 }
 
-export function Hero({ profile, projects = [], onOpenResume, onOpenContact }: HeroProps) {
-  const [heroMode, setHeroMode] = useState<'kinetic' | 'cli'>('kinetic');
-  const heroRef = useRef<HTMLDivElement>(null);
-  const headlineRef = useRef<HTMLHeadingElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-  // GSAP entrance sequence
-  useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
+const group = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+};
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+};
 
-      tl.fromTo('.hero-eyebrow', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
-        .fromTo('.hero-headline', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1 }, 0.4)
-        .fromTo('.hero-subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8 }, 0.7)
-        .fromTo('.hero-cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7 }, 0.9)
-        .fromTo('.hero-stage', { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 1 }, 0.5)
-        .fromTo('.hero-stats > *', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08 }, 1.1);
-    }, heroRef);
+export function Hero({ profile, onOpenResume }: HeroProps) {
+  const reduce = useReducedMotion();
 
-    return () => ctx.revert();
-  }, []);
+  const socials = [
+    { label: 'GitHub', href: profile.socialLinks.github, Icon: Github },
+    { label: 'LinkedIn', href: profile.socialLinks.linkedin, Icon: Linkedin },
+    { label: 'Email', href: profile.socialLinks.email, Icon: Mail },
+  ].filter((s): s is { label: string; href: string; Icon: typeof Github } => Boolean(s.href));
 
   return (
-    <section
-      id="hero"
-      ref={heroRef}
-      className="relative min-h-screen flex flex-col justify-center pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden text-left"
-    >
-      {/* Background ambient shapes */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] rounded-full bg-accent/[0.04] blur-[120px]" />
-        <div className="absolute bottom-1/4 -right-32 w-[400px] h-[400px] rounded-full bg-accent/[0.03] blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-surface-2/50 blur-[80px]" />
-      </div>
+    <section id="top" className="relative overflow-hidden pb-16 pt-28 sm:pt-32 lg:pb-24 lg:pt-40">
+      {/* Technical grid backdrop */}
+      <div
+        aria-hidden="true"
+        className="hairline-grid pointer-events-none absolute inset-0"
+        style={{
+          maskImage: 'radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 72%)',
+          WebkitMaskImage: 'radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 72%)',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-canvas to-transparent"
+      />
 
-      <div className="container-wide relative z-10">
-        {/* Editorial Section Rule */}
-        <div className="section-rule hero-eyebrow" style={{ opacity: 0 }}>
-          <span className="type-eyebrow">[ 01 / Profile ]</span>
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-            </span>
-            <span className="type-meta">{profile.availability}</span>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left: Text Content */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Location + Title Badge */}
-            <div className="hero-eyebrow flex items-center gap-3" style={{ opacity: 0 }}>
-              <span className="chip">
-                <MapPin size={12} className="text-accent" />
-                {profile.location}
+      <div className="shell relative">
+        <motion.div
+          variants={group}
+          initial={reduce ? false : 'hidden'}
+          animate="show"
+          className="grid items-center gap-14 lg:grid-cols-12 lg:gap-12"
+        >
+          {/* Narrative */}
+          <div className="min-w-0 lg:col-span-7">
+            <motion.div variants={item} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="font-display text-lg font-semibold tracking-tight text-ink">
+                {profile.name}
               </span>
-              <span className="chip-accent">
-                <Sparkles size={12} />
-                {profile.title.split('&')[0].trim()}
-              </span>
-            </div>
+              <span aria-hidden="true" className="h-px w-8 bg-line-strong" />
+              <span className="t-label">{profile.title}</span>
+            </motion.div>
 
-            {/* Headline */}
-            <h1 ref={headlineRef} className="type-display hero-headline" style={{ opacity: 0 }}>
-              <span className="block text-ink">Building</span>
-              <span className="block text-gradient-accent">Intelligent</span>
-              <span className="block text-ink">Systems</span>
-            </h1>
+            <motion.h1 variants={item} className="t-display mt-6 text-ink">
+              I build <span className="text-accent">production</span> web systems and{' '}
+              <span className="text-accent">GraphRAG</span> AI.
+            </motion.h1>
 
-            {/* Subtitle */}
-            <p className="type-body text-lg max-w-xl hero-subtitle" style={{ opacity: 0 }}>
-              {profile.tagline}
-            </p>
+            <motion.p variants={item} className="t-lead measure mt-7">
+              I design and engineer full-stack platforms and LLM-powered systems — JWT-secured REST
+              APIs, MongoDB data models, and Neo4j knowledge graphs that answer questions with
+              verifiable evidence.
+            </motion.p>
 
-            {/* CTAs */}
-            <div className="hero-cta flex flex-wrap items-center gap-3 pt-2" style={{ opacity: 0 }}>
+            <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-3">
               <a
                 href="#projects"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="btn-md btn-primary group"
+                className="btn btn-lg btn-primary group"
               >
-                Explore Projects
-                <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                View selected work
+                <ArrowDown
+                  size={16}
+                  className="transition-transform duration-300 group-hover:translate-y-0.5"
+                  aria-hidden="true"
+                />
               </a>
-              <button onClick={onOpenResume} className="btn-md btn-secondary cursor-pointer">
-                View Resume
+              <button type="button" onClick={onOpenResume} className="btn btn-lg btn-outline">
+                Résumé
               </button>
-              <button onClick={onOpenContact} className="btn-md btn-ghost cursor-pointer">
-                Get in Touch
-              </button>
-            </div>
+
+              <div className="ml-1 flex items-center gap-1">
+                {socials.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target={href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel={href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                    className="grid h-10 w-10 place-items-center rounded-md text-ink-2 transition-colors hover:bg-surface-2 hover:text-accent"
+                    aria-label={label}
+                  >
+                    <Icon size={17} aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
-          {/* Right: Interactive Hero Stage */}
-          <div className="lg:col-span-5 hero-stage" style={{ opacity: 0 }}>
-            <div className="relative">
-              {/* Mode Toggle */}
-              <div className="flex justify-center mb-4">
-                <div className="segmented">
-                  <button
-                    onClick={() => setHeroMode('kinetic')}
-                    className={`segmented-item cursor-pointer ${heroMode === 'kinetic' ? 'segmented-item-active' : ''}`}
-                  >
-                    Kinetic 3D
-                  </button>
-                  <button
-                    onClick={() => setHeroMode('cli')}
-                    className={`segmented-item cursor-pointer ${heroMode === 'cli' ? 'segmented-item-active' : ''}`}
-                  >
-                    CLI & Topology
-                  </button>
-                </div>
-              </div>
+          {/* Console */}
+          <motion.div variants={item} className="relative min-w-0 lg:col-span-5">
+            <div
+              aria-hidden="true"
+              className="dot-field pointer-events-none absolute -inset-6 opacity-60"
+              style={{
+                maskImage: 'radial-gradient(70% 70% at 50% 50%, #000, transparent)',
+                WebkitMaskImage: 'radial-gradient(70% 70% at 50% 50%, #000, transparent)',
+              }}
+            />
+            <ProfileConsole profile={profile} />
+            <p className="t-mono mt-3 flex items-center gap-2 text-[0.6875rem] text-ink-3">
+              <ArrowUpRight size={12} aria-hidden="true" />
+              Interactive — switch between config and stack
+            </p>
+          </motion.div>
+        </motion.div>
 
-              {/* Stage Content */}
-              <div className="flex items-center justify-center min-h-[320px] sm:min-h-[360px]">
-                {heroMode === 'kinetic' ? (
-                  <HolographicCore interactive />
-                ) : (
-                  <ArchitectureInspector
-                    profile={profile}
-                    projects={projects}
-                    onOpenContact={onOpenContact}
-                    onOpenResume={onOpenResume}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Strip */}
-        <div className="hero-stats mt-12 sm:mt-16 pt-8 border-t border-line grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
-          {profile.stats.map((stat, idx) => (
-            <div key={idx} className="space-y-1">
-              <div className="font-serif text-2xl sm:text-3xl font-medium text-ink tracking-tight">
-                {stat.value}
-              </div>
-              <div className="type-label text-ink-2">{stat.label}</div>
-              <div className="type-meta">{stat.description}</div>
-            </div>
+        {/* Proof line */}
+        <motion.p
+          variants={item}
+          initial={reduce ? false : 'hidden'}
+          animate="show"
+          className="rule mt-14 flex flex-wrap items-center gap-x-3 gap-y-2 pt-5 md:mt-20"
+        >
+          {profile.credentials.map((credential, i) => (
+            <span key={credential} className="t-mono flex items-center gap-3 text-[0.6875rem] text-ink-3">
+              {i > 0 && <span aria-hidden="true" className="text-line-strong">·</span>}
+              {credential}
+            </span>
           ))}
-        </div>
+        </motion.p>
       </div>
     </section>
   );

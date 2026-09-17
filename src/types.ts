@@ -23,6 +23,7 @@ export interface UserProfile {
   availability: 'Available for full-time' | 'Open to consulting' | 'Booked';
   bioParagraphs: string[];
   stats: UserStat[];
+  credentials: string[];
   socialLinks: SocialLinks;
   resumeDownloadUrl?: string;
   interests: string[];

@@ -9,16 +9,21 @@ export const defaultProfile: UserProfile = {
   phone: '+91-8081697640',
   availability: 'Available for full-time',
   bioParagraphs: [
-    "I'm a B.Tech (CSIT) student at KIET Group of Institutions. My focus is full-stack web development, applied AI/LLM systems, and the computer-science fundamentals behind both.",
-    "I've engineered and deployed full-stack applications and a Python-based LLM and graph-database system, containerized with Docker and backed by CI/CD pipelines.",
-    "My core stack is React, Node.js, Express, and MongoDB on the web side, and Python, Neo4j, and the Google Gemini API for AI — with AWS, Docker, and CI/CD for deployment.",
-    "I care about clean architecture, JWT-secured APIs, and fast, accessible interfaces. I'm currently going deeper on data structures & algorithms and open-source contribution."
+    "I'm a B.Tech (CSIT) student at KIET Group of Institutions, focused on full-stack web development, applied AI/LLM systems, and the computer-science fundamentals behind both.",
+    "I've engineered and deployed full-stack applications and a Python-based LLM and graph-database system — containerized with Docker and delivered through CI/CD pipelines. My core stack is React, Node.js, Express, and MongoDB, with Python, Neo4j, and the Google Gemini API for AI, deployed on AWS.",
+    "I care about clean architecture, JWT-secured APIs, and fast, accessible interfaces. Right now I'm going deeper on data structures & algorithms and open-source contribution."
   ],
   stats: [
     { label: 'DSA Problems Solved', value: '500+', description: 'Across LeetCode, CodeChef & HackerRank' },
     { label: 'AWS Certifications', value: '3', description: 'Solutions Architect, Developer & Cloud Practitioner' },
     { label: 'LeetCode Rating', value: '1400+', description: 'Top 65% globally in contests' },
     { label: 'Merged Pull Requests', value: '3', description: 'GSSoC 2026 open-source contributions' }
+  ],
+  credentials: [
+    '500+ DSA problems solved',
+    '3× AWS certified',
+    "B.Tech CSIT · class of '28",
+    "GSSoC '26 contributor"
   ],
   socialLinks: {
     github: 'https://github.com/Yug-Gupta',

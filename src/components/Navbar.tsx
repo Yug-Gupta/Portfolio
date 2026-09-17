@@ -1,187 +1,256 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Menu, X } from 'lucide-react';
-import { UserProfile } from '../types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion, useScroll, useSpring } from 'motion/react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
+import type { UserProfile } from '../types';
+import type { Theme } from '../hooks/useTheme';
+import { ThemeToggle } from './ThemeToggle';
 
-interface NavbarProps {
-  profile: UserProfile;
-  onOpenResume: () => void;
-  activeSection: string;
-}
-
-const NAV_LINKS = [
+export const NAV_LINKS = [
   { id: 'about', label: 'About' },
-  { id: 'projects', label: 'Projects' },
+  { id: 'projects', label: 'Work' },
   { id: 'skills', label: 'Skills' },
   { id: 'experience', label: 'Experience' },
   { id: 'contact', label: 'Contact' },
 ] as const;
 
-export function Navbar({ profile, onOpenResume, activeSection }: NavbarProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+interface NavbarProps {
+  profile: UserProfile;
+  theme: Theme;
+  onToggleTheme: () => void;
+  onOpenResume: () => void;
+  activeSection: string;
+}
+
+export function Navbar({
+  profile,
+  theme,
+  onToggleTheme,
+  onOpenResume,
+  activeSection,
+}: NavbarProps) {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Lock body scroll when mobile menu open
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
       document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileMenuOpen]);
+    };
+  }, [menuOpen]);
 
-  // Close on Escape
   useEffect(() => {
-    if (!mobileMenuOpen) return;
+    if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileMenuOpen(false);
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab' || !menuRef.current) return;
+      const focusable = menuRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
+    menuRef.current?.querySelector<HTMLElement>('button')?.focus();
     return () => window.removeEventListener('keydown', onKey);
-  }, [mobileMenuOpen]);
+  }, [menuOpen]);
 
-  const handleNavClick = useCallback((id: string) => {
-    setMobileMenuOpen(false);
-    const el = document.getElementById(id);
-    el?.scrollIntoView({ behavior: 'smooth' });
+  const goTo = useCallback((id: string) => {
+    setMenuOpen(false);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
   return (
     <>
       <header
-        id="main-navbar"
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          isScrolled
-            ? 'py-2 sm:py-3'
-            : 'py-3 sm:py-5'
+        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
+          scrolled ? 'border-b border-line bg-canvas/80 backdrop-blur-xl' : 'border-b border-transparent'
         }`}
       >
-        <div className="container-wide">
-          <nav
-            className={`flex items-center justify-between h-12 sm:h-14 px-4 sm:px-6 rounded-2xl transition-all duration-500 ${
-              isScrolled
-                ? 'bg-surface/80 backdrop-blur-xl border border-[rgba(255,255,255,0.06)] shadow-lg'
-                : 'bg-transparent'
-            }`}
-            role="navigation"
-            aria-label="Main navigation"
-          >
-            {/* Brand */}
+        <div className="shell">
+          <nav className="flex h-16 items-center justify-between gap-6" aria-label="Primary">
+            {/* Wordmark */}
             <a
-              href="#hero"
-              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className="flex items-center gap-3 group"
+              href="#top"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="group flex shrink-0 items-baseline gap-2.5"
+              aria-label="Yug Gupta — back to top"
             >
-              <div className="w-8 h-8 rounded-lg bg-accent/15 border border-accent/20 flex items-center justify-center font-mono text-xs font-bold text-accent transition-all duration-300 group-hover:bg-accent/25 group-hover:border-accent/30 group-hover:shadow-[0_0_16px_rgba(212,145,90,0.2)]">
-                YG
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-sm font-semibold text-ink leading-none tracking-tight">{profile.name.split(' ')[0]}</div>
-                <div className="text-[10px] font-mono text-ink-3 mt-0.5">Developer</div>
-              </div>
+              <span className="font-display text-[0.95rem] font-semibold tracking-tight text-ink">
+                {profile.name}
+              </span>
+              <span className="hidden font-mono text-[0.625rem] uppercase tracking-[0.18em] text-ink-3 transition-colors group-hover:text-accent sm:inline">
+                Full-Stack · AI
+              </span>
             </a>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-surface/50 border border-[rgba(255,255,255,0.04)]">
-              {NAV_LINKS.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => handleNavClick(link.id)}
-                  className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 cursor-pointer ${
-                    activeSection === link.id
-                      ? 'text-accent bg-accent/10'
-                      : 'text-ink-3 hover:text-ink-2 hover:bg-[rgba(255,255,255,0.04)]'
-                  }`}
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
+            {/* Desktop links */}
+            <ul className="hidden items-center gap-1 md:flex">
+              {NAV_LINKS.map((link) => {
+                const active = activeSection === link.id;
+                return (
+                  <li key={link.id}>
+                    <button
+                      type="button"
+                      onClick={() => goTo(link.id)}
+                      aria-current={active ? 'true' : undefined}
+                      className={`relative rounded-md px-3 py-2 text-[0.8125rem] transition-colors ${
+                        active ? 'text-ink' : 'text-ink-2 hover:text-ink'
+                      }`}
+                    >
+                      {link.label}
+                      {active && !reduce && (
+                        <motion.span
+                          layoutId="nav-active"
+                          className="absolute inset-x-2 -bottom-px h-px bg-accent"
+                          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        />
+                      )}
+                      {active && reduce && (
+                        <span className="absolute inset-x-2 -bottom-px h-px bg-accent" />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
 
-            {/* Right Actions */}
+            {/* Actions */}
             <div className="flex items-center gap-2">
+              <ThemeToggle theme={theme} onToggle={onToggleTheme} />
               <button
+                type="button"
                 onClick={onOpenResume}
-                className="hidden sm:inline-flex btn-sm btn-outline cursor-pointer"
+                className="btn btn-sm btn-outline hidden sm:inline-flex"
               >
-                Resume
+                Résumé
               </button>
-
-              {/* Mobile Menu Toggle */}
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden btn-icon cursor-pointer"
-                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-                aria-expanded={mobileMenuOpen}
+                type="button"
+                onClick={() => setMenuOpen(true)}
+                className="grid h-9 w-9 place-items-center rounded-md border border-line text-ink-2 transition-colors hover:border-line-strong hover:text-ink md:hidden"
+                aria-label="Open menu"
+                aria-expanded={menuOpen}
+                aria-controls="mobile-menu"
               >
-                {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+                <Menu size={17} aria-hidden="true" />
               </button>
             </div>
           </nav>
         </div>
+
+        {/* Scroll progress */}
+        <motion.div
+          aria-hidden="true"
+          style={{ scaleX: progress }}
+          className="h-px origin-left bg-accent"
+        />
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-canvas/80 backdrop-blur-xl"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-
-          {/* Menu Panel */}
-          <div className="relative z-10 flex flex-col h-full pt-20 pb-8 px-6">
-            <nav className="flex-1 flex flex-col items-start gap-1">
-              {NAV_LINKS.map((link, idx) => (
-                <button
-                  key={link.id}
-                  onClick={() => handleNavClick(link.id)}
-                  className={`w-full text-left px-4 py-3.5 rounded-xl text-lg font-medium transition-all duration-300 cursor-pointer ${
-                    activeSection === link.id
-                      ? 'text-accent bg-accent/10'
-                      : 'text-ink-2 hover:text-ink hover:bg-surface-2'
-                  }`}
-                  style={{
-                    animationDelay: `${idx * 50}ms`,
-                    animation: 'fadeInUp 0.4s ease forwards',
-                    opacity: 0,
-                  }}
-                >
-                  <span className="font-mono text-xs text-ink-3 mr-3">0{idx + 1}</span>
-                  {link.label}
-                </button>
-              ))}
-            </nav>
-
-            <div className="pt-6 border-t border-line space-y-3" style={{ animation: 'fadeInUp 0.4s ease 0.3s forwards', opacity: 0 }}>
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            id="mobile-menu"
+            ref={menuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden"
+          >
+            <div className="shell flex h-16 items-center justify-between">
+              <span className="font-display text-[0.95rem] font-semibold text-ink">{profile.name}</span>
               <button
-                onClick={() => { setMobileMenuOpen(false); onOpenResume(); }}
-                className="btn-md btn-primary w-full cursor-pointer"
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                className="grid h-9 w-9 place-items-center rounded-md border border-line text-ink-2 transition-colors hover:text-ink"
+                aria-label="Close menu"
               >
-                View Resume
+                <X size={17} aria-hidden="true" />
               </button>
-              <p className="type-meta text-center">
-                {profile.email}
-              </p>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Keyframe for mobile menu animation */}
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+            <nav className="shell flex flex-1 flex-col justify-center pb-16" aria-label="Mobile">
+              <ul className="rule">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.li
+                    key={link.id}
+                    initial={reduce ? false : { opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 + i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="border-b border-line"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => goTo(link.id)}
+                      className="group flex w-full items-center justify-between py-5 text-left"
+                    >
+                      <span className="flex items-baseline gap-3">
+                        <span className="font-mono text-[0.6875rem] text-ink-3">
+                          0{i + 1}
+                        </span>
+                        <span className="font-display text-3xl font-medium tracking-tight text-ink transition-colors group-hover:text-accent">
+                          {link.label}
+                        </span>
+                      </span>
+                      <ArrowUpRight
+                        size={20}
+                        className="text-ink-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <div className="mt-10 flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onOpenResume();
+                  }}
+                  className="btn btn-lg btn-primary w-full"
+                >
+                  View Résumé
+                </button>
+                <a href={`mailto:${profile.email}`} className="t-mono text-center text-ink-3">
+                  {profile.email}
+                </a>
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

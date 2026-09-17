@@ -1,38 +1,43 @@
-import React, { useEffect, useRef } from 'react';
-import { X, ExternalLink, Github, TrendingUp, Check } from 'lucide-react';
-import { Project } from '../types';
+import { useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Check, ExternalLink, Github, X } from 'lucide-react';
+import type { Project } from '../types';
+import { ProjectDiagram } from './ProjectDiagram';
 
 interface ProjectModalProps {
   project: Project | null;
   onClose: () => void;
 }
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export function ProjectModal({ project, onClose }: ProjectModalProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!project) return;
-
     document.body.style.overflow = 'hidden';
     closeRef.current?.focus();
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      // Focus trap
-      if (e.key === 'Tab' && modalRef.current) {
-        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, a[href], input, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last?.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first?.focus();
-        }
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
       }
     };
 
@@ -43,129 +48,156 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
     };
   }, [project, onClose]);
 
-  if (!project) return null;
+  const [name, subtitle] = project ? project.title.split(' — ') : ['', ''];
+  const variant = project?.id === 'nexora' ? 'graph' : 'pipeline';
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="project-modal-title"
-    >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-canvas/80 backdrop-blur-md"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div
-        ref={modalRef}
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden glass-card-static flex flex-col animate-in fade-in zoom-in-95 duration-200"
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between p-6 sm:p-8 pb-0">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="chip-accent">{project.category}</span>
-              <span className="type-meta">{project.year}</span>
-              {project.role && <span className="type-meta">· {project.role}</span>}
-            </div>
-            <h2 id="project-modal-title" className="type-subsection text-ink">
-              {project.title}
-            </h2>
-            <p className="type-body-sm italic text-ink-3">{project.tagline}</p>
-          </div>
-          <button
-            ref={closeRef}
+    <AnimatePresence>
+      {project && (
+        <motion.div
+          className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          <div
+            className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
             onClick={onClose}
-            className="btn-icon shrink-0 ml-4 cursor-pointer"
-            aria-label="Close dialog"
+            aria-hidden="true"
+          />
+
+          <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-modal-title"
+            initial={{ opacity: 0, y: 24, scale: 0.99 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.99 }}
+            transition={{ duration: 0.35, ease: EASE }}
+            className="relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-xl border border-line-strong bg-surface sm:rounded-xl"
           >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            {project.demoUrl && (
-              <a
-                href={project.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-sm btn-primary"
+            {/* Header */}
+            <div className="flex items-start justify-between gap-6 border-b border-line bg-surface-2 px-6 py-4 sm:px-8">
+              <div className="marker flex-wrap pt-1">
+                <span className="marker-index">{project.category}</span>
+                <span aria-hidden="true">/</span>
+                <span>{project.year}</span>
+                {project.role && (
+                  <>
+                    <span aria-hidden="true">/</span>
+                    <span>{project.role}</span>
+                  </>
+                )}
+              </div>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={onClose}
+                className="btn-icon h-9 w-9 shrink-0"
+                aria-label="Close case study"
               >
-                <ExternalLink size={14} /> Live Demo
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-sm btn-secondary"
-              >
-                <Github size={14} /> Source Code
-              </a>
-            )}
-          </div>
-
-                            {project.metrics && (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                              {project.metrics.map((metric, mIdx) => (
-                                <div key={mIdx} className="panel p-3 text-center space-y-1">
-                                  <TrendingUp size={14} className="mx-auto text-accent" />
-                                  <div className="font-serif text-lg font-medium text-ink">{metric.value}</div>
-                                  <div className="type-meta">{metric.label}</div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-          {/* Full Description */}
-          <div className="space-y-2">
-            <h3 className="type-label">Architecture & Deep Dive</h3>
-            <p className="type-body leading-relaxed">{project.fullDescription || project.description}</p>
-          </div>
-
-          {/* Features */}
-          {project.features.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="type-label">Technical Highlights</h3>
-              <ul className="space-y-2">
-                {project.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2.5 type-body-sm">
-                    <Check size={14} className="text-accent mt-0.5 shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+                <X size={17} aria-hidden="true" />
+              </button>
             </div>
-          )}
 
-          {/* Tech Stack */}
-          <div className="space-y-2">
-            <h3 className="type-label">Technology Stack</h3>
-            <div className="flex flex-wrap gap-1.5">
-              {project.technologies.map((tech) => (
-                <span key={tech} className="chip">{tech}</span>
-              ))}
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-6 py-8 sm:px-8">
+                <h2 id="project-modal-title" className="t-h2 text-ink">
+                  {name}
+                </h2>
+                {subtitle && <p className="t-lead mt-3">{subtitle}</p>}
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  {project.demoUrl && (
+                    <a
+                      href={project.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-md btn-primary"
+                    >
+                      <ExternalLink size={15} aria-hidden="true" />
+                      Live project
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-md btn-outline"
+                    >
+                      <Github size={15} aria-hidden="true" />
+                      Source code
+                    </a>
+                  )}
+                </div>
+
+                {/* Metrics */}
+                {project.metrics && project.metrics.length > 0 && (
+                  <dl className="mt-9 grid grid-cols-1 gap-px border border-line sm:grid-cols-3">
+                    {project.metrics.map((metric) => (
+                      <div key={metric.label} className="bg-surface-2 px-4 py-4">
+                        <dt className="t-label">{metric.label}</dt>
+                        <dd className="font-display mt-1.5 text-lg font-medium text-ink">
+                          {metric.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                {/* Overview */}
+                <section className="mt-9">
+                  <h3 className="t-label">Overview</h3>
+                  <p className="t-body measure mt-3">
+                    {project.fullDescription || project.description}
+                  </p>
+                </section>
+
+                {/* Features */}
+                {project.features.length > 0 && (
+                  <section className="mt-9">
+                    <h3 className="t-label">Key functionality</h3>
+                    <ul className="mt-4 space-y-3">
+                      {project.features.map((feature) => (
+                        <li key={feature} className="flex gap-3">
+                          <Check size={15} className="mt-1 shrink-0 text-accent" aria-hidden="true" />
+                          <span className="t-small">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {/* Architecture */}
+                <section className="mt-9">
+                  <h3 className="t-label">Architecture</h3>
+                  <div className="window mt-4 bg-surface-2">
+                    <div className="aspect-[4/3] p-5 sm:p-7">
+                      <ProjectDiagram variant={variant} label={`${name} architecture diagram`} />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Stack */}
+                <section className="mt-9">
+                  <h3 className="t-label">Stack</h3>
+                  <ul className="mt-4 flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <li key={tech} className="chip">
+                        {tech}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-6 sm:p-8 pt-0">
-          <button
-            onClick={onClose}
-            className="btn-md btn-secondary w-full cursor-pointer"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
