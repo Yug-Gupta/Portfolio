@@ -47,7 +47,10 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
             return (
               <Reveal key={project.id}>
-                <article className="grid gap-8 border-t border-line py-12 lg:grid-cols-12 lg:gap-14 lg:py-16">
+                <article
+                  id={`project-${project.id}`}
+                  className="grid gap-8 border-t border-line py-12 lg:grid-cols-12 lg:gap-14 lg:py-16"
+                >
                   {/* Narrative */}
                   <div className={`lg:col-span-5 ${flipped ? 'lg:order-2' : ''}`}>
                     <div className="marker flex-wrap">
@@ -70,7 +73,7 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
 
                     <p className="t-body measure mt-5">{project.description}</p>
 
-                    <ul className="mt-6 space-y-2.5">
+                    <ul className="measure mt-6 space-y-2.5">
                       {project.features.slice(0, 3).map((feature) => (
                         <li key={feature} className="flex gap-3">
                           <span aria-hidden="true" className="mt-2 h-1 w-1 shrink-0 bg-accent" />

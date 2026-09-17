@@ -50,7 +50,7 @@ export function ExperienceSection({ experiences, educations, profile }: Experien
                       <span className="text-ink-3"> · {exp.location}</span>
                     </p>
 
-                    <p className="t-small mt-4">{exp.description}</p>
+                    <p className="t-small measure mt-4">{exp.description}</p>
 
                     {exp.highlights.length > 0 && (
                       <ul className="mt-3 space-y-2">

@@ -153,18 +153,12 @@ html.dark {
    ------------------------------------------------------------ */
 @layer components {
   /* ── Layout ── */
+  /* Uses the available viewport with comfortable outer gutters and a
+     sensible max width on very large displays. --gutter is per side. */
   .shell {
-    width: 100%;
-    max-width: 1280px;
+    --gutter: clamp(1.25rem, 3.5vw, 2.75rem);
+    width: min(calc(100% - var(--gutter) * 2), 1600px);
     margin-inline: auto;
-    padding-inline: clamp(1.25rem, 4vw, 3rem);
-  }
-
-  .shell-narrow {
-    width: 100%;
-    max-width: 960px;
-    margin-inline: auto;
-    padding-inline: clamp(1.25rem, 4vw, 3rem);
   }
 
   .measure {
@@ -504,6 +498,24 @@ html.dark {
     animation: flow-dash 1.8s linear infinite;
   }
 
+  /* ── Terminal ── */
+  .term-line {
+    animation: term-line-in 0.18s var(--ease-expo) both;
+  }
+
+  .term-caret {
+    display: inline-block;
+    width: 0.55ch;
+    height: 1.05em;
+    background: var(--color-accent);
+    animation: term-caret-blink 1.1s steps(1, end) infinite;
+  }
+
+  .term-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
   /* ── Section marker ── */
   .marker {
     display: flex;
@@ -526,6 +538,28 @@ html.dark {
   }
 }
 
+@keyframes term-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes term-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
 /* ------------------------------------------------------------
    REDUCED MOTION
    ------------------------------------------------------------ */
@@ -537,6 +571,7 @@ html.dark {
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;

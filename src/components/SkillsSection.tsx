@@ -1,14 +1,10 @@
 import type { SkillCategory } from '../types';
 import { SectionHeading } from './SectionHeading';
 import { Reveal } from './Reveal';
+import { shortSkillName } from '../lib/format';
 
 interface SkillsSectionProps {
   categories: SkillCategory[];
-}
-
-/** "AWS (EC2, S3, …)" reads better as "AWS" in a scannable list. */
-function displayName(name: string) {
-  return name.split(' (')[0];
 }
 
 export function SkillsSection({ categories }: SkillsSectionProps) {
@@ -47,7 +43,7 @@ export function SkillsSection({ categories }: SkillsSectionProps) {
                             className="inline-block h-1 w-1 shrink-0 translate-y-[-2px] bg-accent"
                           />
                         )}
-                        <span title={skill.name}>{displayName(skill.name)}</span>
+                        <span title={skill.name}>{shortSkillName(skill.name)}</span>
                       </span>
                       <span className="t-mono shrink-0 text-[0.6875rem] text-ink-3">
                         {skill.experienceYears}

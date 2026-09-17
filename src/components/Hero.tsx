@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from 'lucide-react';
+import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react';
 import type { UserProfile } from '../types';
 import { ProfileConsole } from './ProfileConsole';
 
@@ -120,11 +120,7 @@ export function Hero({ profile, onOpenResume }: HeroProps) {
                 WebkitMaskImage: 'radial-gradient(70% 70% at 50% 50%, #000, transparent)',
               }}
             />
-            <ProfileConsole profile={profile} />
-            <p className="t-mono mt-3 flex items-center gap-2 text-[0.6875rem] text-ink-3">
-              <ArrowUpRight size={12} aria-hidden="true" />
-              Interactive — switch between config and stack
-            </p>
+            <ProfileConsole profile={profile} onOpenResume={onOpenResume} />
           </motion.div>
         </motion.div>
 
