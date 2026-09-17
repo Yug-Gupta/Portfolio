@@ -36,10 +36,10 @@ export function ExperienceSection({ experiences, educations, profile }: Experien
 
                   <Reveal delay={i * 0.06}>
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                      <span className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">
+                      <span className="t-meta-label">
                         {exp.period}
                       </span>
-                      <span className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-accent">
+                      <span className="t-meta-label text-accent">
                         {exp.type}
                       </span>
                     </div>
@@ -87,7 +87,7 @@ export function ExperienceSection({ experiences, educations, profile }: Experien
                 <Reveal key={edu.id} delay={i * 0.05} className="py-5">
                   <dt className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                     <span className="t-h4 text-ink">{edu.degree}</span>
-                    <span className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">
+                    <span className="t-meta-label">
                       {edu.period}
                     </span>
                   </dt>
@@ -96,7 +96,7 @@ export function ExperienceSection({ experiences, educations, profile }: Experien
                     <span className="text-ink-3"> · {edu.location}</span>
                   </dd>
                   {(edu.grade || edu.details) && (
-                    <dd className="t-mono mt-2 text-[0.6875rem] text-ink-3">
+                    <dd className="t-mono mt-2 text-xs text-ink-3">
                       {[edu.grade, edu.details].filter(Boolean).join(' · ')}
                     </dd>
                   )}
@@ -119,7 +119,7 @@ export function ExperienceSection({ experiences, educations, profile }: Experien
                       <div className="t-h4 text-ink">{stat.label}</div>
                       <p className="t-small mt-1">{stat.description}</p>
                     </div>
-                    <span className="font-display shrink-0 text-xl font-medium text-accent">
+                    <span className="t-h4 shrink-0 text-accent">
                       {stat.value}
                     </span>
                   </Reveal>

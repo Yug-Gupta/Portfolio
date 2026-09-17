@@ -216,7 +216,7 @@ export function ProfileConsole({ profile, onOpenResume }: ProfileConsoleProps) {
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface-2 px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-3">
             <Terminal size={14} className="shrink-0 text-accent" aria-hidden="true" />
-            <span className="t-mono truncate text-[0.6875rem] text-ink-3">{FILENAME[view]}</span>
+            <span className="t-mono truncate text-xs text-ink-3">{FILENAME[view]}</span>
           </div>
 
           <div className="seg shrink-0">
@@ -252,7 +252,7 @@ export function ProfileConsole({ profile, onOpenResume }: ProfileConsoleProps) {
             aria-label={view === 'output' ? 'Terminal output' : undefined}
           >
             {view === 'output' ? (
-              <div className="p-4 text-[0.75rem] leading-[1.7] sm:p-5 sm:text-[0.8125rem]">
+              <div className="p-4 text-xs leading-[1.7] sm:p-5 sm:text-md">
                 {entries.map((entry) => (
                   <OutputEntry
                     key={entry.id}
@@ -274,7 +274,7 @@ export function ProfileConsole({ profile, onOpenResume }: ProfileConsoleProps) {
                   >
                     <pre
                       tabIndex={0}
-                      className="t-mono overflow-x-auto p-4 text-[0.6875rem] leading-[1.9] sm:p-5 sm:text-[0.8125rem] sm:leading-[1.85]"
+                      className="t-mono overflow-x-auto p-4 text-xs leading-[1.9] sm:p-5 sm:text-md sm:leading-[1.85]"
                       aria-label="Developer profile as code"
                     >
                       <code>
@@ -295,7 +295,7 @@ export function ProfileConsole({ profile, onOpenResume }: ProfileConsoleProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
                     transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                    className="t-mono overflow-x-auto whitespace-pre p-4 text-[0.6875rem] leading-[1.75] sm:p-5 sm:text-xs sm:leading-[1.8]"
+                    className="t-mono overflow-x-auto whitespace-pre p-4 text-xs leading-[1.75] sm:p-5 sm:text-md sm:leading-[1.8]"
                     aria-label="Technology stack"
                   >
                     <StackTree />
@@ -305,63 +305,71 @@ export function ProfileConsole({ profile, onOpenResume }: ProfileConsoleProps) {
             )}
           </div>
 
-          {/* Command input — appears once the terminal is activated */}
+          {/* Command input — appears once the terminal is activated.
+              Tinted bar + bordered field so the interactive zone is
+              clearly signalled (not just a cursor). */}
           {activated && (
-            <div className="flex items-center gap-2 border-t border-line px-4 py-2.5 text-[0.75rem] sm:text-[0.8125rem]">
-              <span className="t-mono shrink-0 text-accent">{PROMPT}</span>
-              <span className="relative min-w-0 flex-1">
-                <input
-                  ref={inputRef}
-                  value={value}
-                  onChange={(event) => setValue(event.target.value)}
-                  onKeyDown={onInputKeyDown}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  aria-label="Terminal command input"
-                  placeholder="help"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  className="t-mono w-full bg-transparent text-ink caret-accent outline-none placeholder:text-ink-3/60"
-                />
-                {value === '' && !focused && (
-                  <span
-                    className="term-caret pointer-events-none absolute left-0 top-1/2 -translate-y-1/2"
-                    aria-hidden="true"
+            <div className="border-t border-line bg-surface-2 px-3 py-2.5 sm:px-4">
+              <div className="flex items-center gap-2 rounded-sm border border-line bg-surface px-2.5 py-1.5 text-xs transition-colors focus-within:border-accent/70 sm:text-md">
+                <span className="t-mono shrink-0 text-accent">{PROMPT}</span>
+                <span className="relative min-w-0 flex-1">
+                  <input
+                    ref={inputRef}
+                    value={value}
+                    onChange={(event) => setValue(event.target.value)}
+                    onKeyDown={onInputKeyDown}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
+                    aria-label="Terminal command input"
+                    placeholder="help"
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    className="t-mono w-full bg-transparent text-ink caret-accent outline-none placeholder:text-ink-3/60"
                   />
-                )}
-              </span>
+                  {value === '' && !focused && (
+                    <span
+                      className="term-caret pointer-events-none absolute left-0 top-1/2 -translate-y-1/2"
+                      aria-hidden="true"
+                    />
+                  )}
+                </span>
+              </div>
             </div>
           )}
         </div>
 
         {/* Status bar */}
         <div className="flex items-center justify-between gap-4 border-t border-line bg-surface-2 px-4 py-2.5">
-          <span className="t-mono flex items-center gap-2 text-[0.6875rem] text-ink-2">
+          <span className="t-mono flex items-center gap-2 text-xs text-ink-2">
             <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
             </span>
             {profile.availability}
           </span>
-          <span className="t-mono shrink-0 text-[0.6875rem] text-ink-3">
+          <span className="t-mono shrink-0 text-xs text-ink-3">
             IST {time}
             <span className="hidden sm:inline"> · UTC+5:30</span>
           </span>
         </div>
       </div>
 
-      {/* Interactive hint */}
+      {/* Interactive hint — part of the shared button system (ghost). */}
       <button
         type="button"
         onClick={activate}
-        className="t-mono mt-3 flex items-center gap-2 text-left text-[0.6875rem] text-ink-3 transition-colors hover:text-accent"
+        className="btn btn-sm btn-ghost mt-2 justify-start whitespace-normal text-left"
       >
-        <ArrowUpRight size={12} aria-hidden="true" />
-        {activated
-          ? 'Type a command · ↑↓ history · Tab complete · Ctrl+L clear · Esc to exit'
-          : "Interactive — click to run commands (try 'help')"}
+        <ArrowUpRight size={12} className="shrink-0" aria-hidden="true" />
+        {/* Shortcuts are only surfaced while the user is actually typing,
+            to keep this secondary feature low-noise. */}
+        {!activated
+          ? "Run a command — try 'help'"
+          : focused
+            ? '↑↓ history · Tab complete · Ctrl+L clear · Esc to exit'
+            : 'Terminal ready — type a command'}
       </button>
     </div>
   );
@@ -422,13 +430,16 @@ function LineView({ line, onScroll }: { line: TerminalLine; onScroll: (id: strin
   if (line.scrollTo) {
     const id = line.scrollTo;
     return (
-      <button
-        type="button"
-        onClick={() => onScroll(id)}
-        className={`${tone} text-left hover:underline hover:underline-offset-2`}
+      <a
+        href={`#${id}`}
+        onClick={(event) => {
+          event.preventDefault();
+          onScroll(id);
+        }}
+        className={`${tone} underline-offset-2 hover:underline`}
       >
         → {line.text}
-      </button>
+      </a>
     );
   }
 

@@ -42,12 +42,6 @@ export function AboutSection({ profile, onOpenResume }: AboutSectionProps) {
           label="Profile"
           title="Engineering, with intent."
           intro="A developer profile rather than a résumé — what I work on, what I care about, and how I approach building software."
-          aside={
-            <button type="button" onClick={onOpenResume} className="btn btn-md btn-outline">
-              Read full résumé
-              <ArrowUpRight size={15} aria-hidden="true" />
-            </button>
-          }
         />
 
         <div className="mt-14 grid gap-12 lg:mt-20 lg:grid-cols-12 lg:gap-16">
@@ -58,6 +52,15 @@ export function AboutSection({ profile, onOpenResume }: AboutSectionProps) {
                 <p className={`t-body measure ${i === 0 ? '' : 'mt-5'}`}>{paragraph}</p>
               </Reveal>
             ))}
+
+            {/* Résumé action sits with the narrative it belongs to,
+                instead of being pushed to the far edge of the heading. */}
+            <Reveal delay={0.18}>
+              <button type="button" onClick={onOpenResume} className="btn btn-md btn-outline mt-8">
+                Read full résumé
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </button>
+            </Reveal>
           </div>
 
           {/* Fact sheet */}
@@ -68,7 +71,7 @@ export function AboutSection({ profile, onOpenResume }: AboutSectionProps) {
               <dl className="mt-5 divide-y divide-line">
                 {facts.map((fact) => (
                   <div key={fact.key} className="grid grid-cols-[4.5rem_1fr] gap-3 py-3.5">
-                    <dt className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">
+                    <dt className="t-label">
                       {fact.key}
                     </dt>
                     <dd className="t-small text-ink">{fact.value}</dd>
@@ -100,7 +103,7 @@ export function AboutSection({ profile, onOpenResume }: AboutSectionProps) {
             {PRINCIPLES.map((principle, i) => (
               <Reveal key={principle.title} delay={i * 0.06} className="bg-canvas">
                 <div className="h-full p-6 lg:p-7">
-                  <span className="t-mono text-[0.6875rem] text-accent">
+                  <span className="t-mono text-xs text-accent">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <h4 className="t-h4 mt-3 text-ink">{principle.title}</h4>

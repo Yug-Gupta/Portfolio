@@ -14,7 +14,7 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
     <button
       type="button"
       onClick={onToggle}
-      className="relative grid h-9 w-9 place-items-center rounded-md border border-line text-ink-2 transition-colors hover:border-line-strong hover:text-ink"
+      className="btn-icon"
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
       aria-pressed={isDark}
     >

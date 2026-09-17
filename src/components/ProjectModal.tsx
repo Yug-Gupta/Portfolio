@@ -141,7 +141,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
                     {project.metrics.map((metric) => (
                       <div key={metric.label} className="bg-surface-2 px-4 py-4">
                         <dt className="t-label">{metric.label}</dt>
-                        <dd className="font-display mt-1.5 text-lg font-medium text-ink">
+                        <dd className="t-h4 mt-1.5 text-ink">
                           {metric.value}
                         </dd>
                       </div>

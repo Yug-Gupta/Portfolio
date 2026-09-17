@@ -45,7 +45,7 @@ export function SkillsSection({ categories }: SkillsSectionProps) {
                         )}
                         <span title={skill.name}>{shortSkillName(skill.name)}</span>
                       </span>
-                      <span className="t-mono shrink-0 text-[0.6875rem] text-ink-3">
+                      <span className="t-mono shrink-0 text-xs text-ink-3">
                         {skill.experienceYears}
                       </span>
                     </li>
@@ -57,7 +57,7 @@ export function SkillsSection({ categories }: SkillsSectionProps) {
         </Reveal>
 
         <Reveal>
-          <p className="t-mono mt-5 flex items-center gap-2 text-[0.6875rem] text-ink-3">
+          <p className="t-mono mt-5 flex items-center gap-2 text-xs text-ink-3">
             <span aria-hidden="true" className="inline-block h-1 w-1 bg-accent" />
             primary focus
           </p>

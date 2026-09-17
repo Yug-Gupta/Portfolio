@@ -101,40 +101,50 @@ export function Navbar({
               className="group flex shrink-0 items-baseline gap-2.5"
               aria-label="Yug Gupta — back to top"
             >
-              <span className="font-display text-[0.95rem] font-semibold tracking-tight text-ink">
+              <span className="font-display text-base font-semibold tracking-tight text-ink">
                 {profile.name}
               </span>
-              <span className="hidden font-mono text-[0.625rem] uppercase tracking-[0.18em] text-ink-3 transition-colors group-hover:text-accent sm:inline">
+              <span className="hidden transition-colors group-hover:text-accent sm:inline t-label">
                 Full-Stack · AI
               </span>
             </a>
 
             {/* Desktop links */}
-            <ul className="hidden items-center gap-1 md:flex">
+            <ul className="hidden items-center gap-1 lg:flex">
               {NAV_LINKS.map((link) => {
                 const active = activeSection === link.id;
                 return (
                   <li key={link.id}>
-                    <button
-                      type="button"
-                      onClick={() => goTo(link.id)}
-                      aria-current={active ? 'true' : undefined}
-                      className={`relative rounded-md px-3 py-2 text-[0.8125rem] transition-colors ${
-                        active ? 'text-ink' : 'text-ink-2 hover:text-ink'
+                    <a
+                      href={`#${link.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goTo(link.id);
+                      }}
+                      aria-current={active ? 'location' : undefined}
+                      className={`relative block rounded-md px-3 py-2 text-sm transition-colors ${
+                        active
+                          ? 'font-medium text-ink'
+                          : 'text-ink-2 hover:text-ink'
                       }`}
                     >
                       {link.label}
+                      {/* Active section indicator — 2px accent underline */}
                       {active && !reduce && (
                         <motion.span
                           layoutId="nav-active"
-                          className="absolute inset-x-2 -bottom-px h-px bg-accent"
+                          aria-hidden="true"
+                          className="absolute inset-x-2 -bottom-0.5 h-0.5 rounded-full bg-accent"
                           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         />
                       )}
                       {active && reduce && (
-                        <span className="absolute inset-x-2 -bottom-px h-px bg-accent" />
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-x-2 -bottom-0.5 h-0.5 rounded-full bg-accent"
+                        />
                       )}
-                    </button>
+                    </a>
                   </li>
                 );
               })}
@@ -153,7 +163,7 @@ export function Navbar({
               <button
                 type="button"
                 onClick={() => setMenuOpen(true)}
-                className="grid h-9 w-9 place-items-center rounded-md border border-line text-ink-2 transition-colors hover:border-line-strong hover:text-ink md:hidden"
+                className="btn-icon lg:hidden"
                 aria-label="Open menu"
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
@@ -185,14 +195,14 @@ export function Navbar({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[60] flex flex-col bg-canvas md:hidden"
+            className="fixed inset-0 z-[60] flex flex-col bg-canvas lg:hidden"
           >
             <div className="shell flex h-16 items-center justify-between">
-              <span className="font-display text-[0.95rem] font-semibold text-ink">{profile.name}</span>
+              <span className="t-h4">{profile.name}</span>
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="grid h-9 w-9 place-items-center rounded-md border border-line text-ink-2 transition-colors hover:text-ink"
+                className="btn-icon"
                 aria-label="Close menu"
               >
                 <X size={17} aria-hidden="true" />
@@ -209,16 +219,24 @@ export function Navbar({
                     transition={{ delay: 0.05 + i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     className="border-b border-line"
                   >
-                    <button
-                      type="button"
-                      onClick={() => goTo(link.id)}
+                    <a
+                      href={`#${link.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goTo(link.id);
+                      }}
+                      aria-current={activeSection === link.id ? 'location' : undefined}
                       className="group flex w-full items-center justify-between py-5 text-left"
                     >
                       <span className="flex items-baseline gap-3">
-                        <span className="font-mono text-[0.6875rem] text-ink-3">
+                        <span className="font-mono text-xs text-ink-3">
                           0{i + 1}
                         </span>
-                        <span className="font-display text-3xl font-medium tracking-tight text-ink transition-colors group-hover:text-accent">
+                        <span
+                          className={`t-h3 transition-colors group-hover:text-accent ${
+                            activeSection === link.id ? 'text-accent' : 'text-ink'
+                          }`}
+                        >
                           {link.label}
                         </span>
                       </span>
@@ -227,7 +245,7 @@ export function Navbar({
                         className="text-ink-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
                         aria-hidden="true"
                       />
-                    </button>
+                    </a>
                   </motion.li>
                 ))}
               </ul>

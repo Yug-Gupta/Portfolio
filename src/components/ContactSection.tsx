@@ -111,7 +111,7 @@ export function ContactSection({ profile, onOpenResume }: ContactSectionProps) {
                 className="group block border-t border-line pt-6"
               >
                 <span className="t-label">Email</span>
-                <span className="font-display mt-2 flex items-center gap-2 break-all text-xl font-medium tracking-tight text-ink transition-colors group-hover:text-accent sm:text-2xl">
+                <span className="t-h3 mt-2 flex items-center gap-2 break-all text-ink transition-colors group-hover:text-accent">
                   {profile.email}
                   <ArrowUpRight
                     size={18}
@@ -217,7 +217,7 @@ export function ContactSection({ profile, onOpenResume }: ContactSectionProps) {
                   className={`field mt-2 resize-none ${errors.message ? 'field-error' : ''}`}
                 />
                 {errors.message && (
-                  <p id="contact-message-error" role="alert" className="t-mono mt-2 text-[0.6875rem] text-danger">
+                  <p id="contact-message-error" role="alert" className="t-mono mt-2 text-xs text-danger">
                     {errors.message}
                   </p>
                 )}
@@ -228,7 +228,7 @@ export function ContactSection({ profile, onOpenResume }: ContactSectionProps) {
                   <Mail size={15} aria-hidden="true" />
                   Send message
                 </button>
-                <p className="t-mono text-[0.6875rem] text-ink-3">
+                <p className="t-mono text-xs text-ink-3">
                   {sent ? 'Opening your mail client…' : 'Opens a draft in your mail client.'}
                 </p>
               </div>
@@ -268,7 +268,7 @@ function Field({ id, label, value, placeholder, onChange, error, type = 'text' }
         className={`field mt-2 ${error ? 'field-error' : ''}`}
       />
       {error && (
-        <p id={errorId} role="alert" className="t-mono mt-2 text-[0.6875rem] text-danger">
+        <p id={errorId} role="alert" className="t-mono mt-2 text-xs text-danger">
           {error}
         </p>
       )}

@@ -90,11 +90,13 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                       ))}
                     </ul>
 
-                    <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                    <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+                      {/* Primary action for the case study — same button
+                          system as the hero, one step down in emphasis. */}
                       <button
                         type="button"
                         onClick={() => setSelected(project)}
-                        className="link-mono text-ink"
+                        className="btn btn-md btn-outline"
                       >
                         Read the case study
                         <ArrowUpRight size={14} aria-hidden="true" />
@@ -124,37 +126,21 @@ export function ProjectsSection({ projects }: ProjectsSectionProps) {
                     </div>
                   </div>
 
-                  {/* Diagram */}
-                  <div className={`lg:col-span-7 ${flipped ? 'lg:order-1' : ''}`}>
-                    <button
-                      type="button"
-                      onClick={() => setSelected(project)}
-                      aria-label={`Open ${name} case study`}
-                      className="group block w-full text-left"
-                    >
-                      <div className="window bg-surface-2 transition-colors duration-300 group-hover:border-line-strong">
-                        <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-                          <span className="t-mono text-[0.6875rem] text-ink-3">
-                            {variant === 'graph' ? 'retrieval-pipeline' : 'request-lifecycle'}
-                          </span>
-                          <span className="t-mono flex items-center gap-2 text-[0.6875rem] text-ink-3 transition-colors group-hover:text-accent">
-                            case study
-                            <ArrowUpRight
-                              size={12}
-                              className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        </div>
-                        <div className="aspect-[4/3] p-5 sm:p-7">
-                          <ProjectDiagram
-                            variant={variant}
-                            label={`${name} architecture diagram`}
-                          />
-                        </div>
+                  {/* Diagram — illustrative; the single case-study CTA
+                      below avoids two competing triggers for one action. */}
+                  <figure className={`lg:col-span-7 ${flipped ? 'lg:order-1' : ''} m-0`}>
+                    <div className="window bg-surface-2">
+                      <figcaption className="flex items-center justify-between border-b border-line px-4 py-2.5">
+                        <span className="t-mono text-xs text-ink-3">
+                          {variant === 'graph' ? 'retrieval-pipeline' : 'request-lifecycle'}
+                        </span>
+                        <span className="t-mono text-xs text-ink-3">architecture</span>
+                      </figcaption>
+                      <div className="aspect-[4/3] p-5 sm:p-7">
+                        <ProjectDiagram variant={variant} label={`${name} architecture diagram`} />
                       </div>
-                    </button>
-                  </div>
+                    </div>
+                  </figure>
                 </article>
               </Reveal>
             );

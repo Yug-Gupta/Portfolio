@@ -56,7 +56,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
               strokeWidth="2"
             />
           ))}
-          <text x="30" y="202" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="30" y="202" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             documents
           </text>
 
@@ -70,7 +70,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             markerEnd={`url(#${markerId})`}
           />
           <line x1="96" y1="146" x2="198" y2="150" className="flow-dash stroke-accent" />
-          <text x="116" y="136" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="116" y="136" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             extract
           </text>
 
@@ -108,7 +108,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
           ))}
           <circle cx="220" cy="150" r="17" className="fill-surface stroke-accent" strokeWidth="1.5" />
           <circle cx="220" cy="150" r="4" className="fill-accent animate-pulse" />
-          <text x="220" y="252" textAnchor="middle" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="220" y="252" textAnchor="middle" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             neo4j graph
           </text>
 
@@ -122,7 +122,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             markerEnd={`url(#${markerId})`}
           />
           <line x1="240" y1="150" x2="332" y2="150" className="flow-dash stroke-accent" />
-          <text x="270" y="136" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="270" y="136" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             ground
           </text>
 
@@ -155,7 +155,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <text x="336" y="212" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="426" y="212" textAnchor="end" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             cited answer
           </text>
         </g>
@@ -171,11 +171,11 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
           <rect x="30" y="139" width="74" height="9" rx="2" className="fill-surface-2 stroke-line" />
           <rect x="30" y="156" width="86" height="9" rx="2" className="fill-surface-2 stroke-line" />
           <rect x="30" y="173" width="56" height="9" rx="2" className="fill-surface-2 stroke-line" />
-          <text x="16" y="228" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="16" y="228" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             react client
           </text>
           <rect x="16" y="236" width="70" height="20" rx="3" className="fill-surface stroke-line" />
-          <text x="26" y="250" className="fill-ink-3 text-[9px] tracking-[0.1em] uppercase">
+          <text x="26" y="250" className="fill-ink-3 text-xs tracking-[0.1em] uppercase">
             zustand
           </text>
 
@@ -188,10 +188,10 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             fill="none"
             strokeWidth="1.4"
           />
-          <text x="223" y="165" textAnchor="middle" className="fill-ink text-[9px] tracking-[0.08em] uppercase">
+          <text x="223" y="159" textAnchor="middle" className="fill-ink text-xs tracking-[0.08em] uppercase">
             express
           </text>
-          <text x="223" y="176" textAnchor="middle" className="fill-ink-3 text-[8px] tracking-[0.08em] uppercase">
+          <text x="223" y="175" textAnchor="middle" className="fill-ink-3 text-xs tracking-[0.08em] uppercase">
             rest · jwt
           </text>
 
@@ -200,7 +200,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
           <ellipse cx="370" cy="104" rx="44" ry="10" className="fill-surface-2 stroke-line-strong" />
           <ellipse cx="370" cy="130" rx="44" ry="10" className="fill-none stroke-line" />
           <ellipse cx="370" cy="156" rx="44" ry="10" className="fill-none stroke-line" />
-          <text x="370" y="208" textAnchor="middle" className="fill-ink-3 text-[9px] tracking-[0.15em] uppercase">
+          <text x="370" y="208" textAnchor="middle" className="fill-ink-3 text-xs tracking-[0.15em] uppercase">
             mongodb
           </text>
 
@@ -215,7 +215,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             markerEnd={`url(#${markerId})`}
           />
           <line x1="134" y1="150" x2="184" y2="150" className="flow-dash stroke-accent" />
-          <text x="159" y="140" textAnchor="middle" className="fill-ink-3 text-[9px] tracking-[0.12em] uppercase">
+          <text x="159" y="140" textAnchor="middle" className="fill-ink-3 text-xs tracking-[0.12em] uppercase">
             http
           </text>
 
@@ -229,7 +229,7 @@ export function ProjectDiagram({ variant, label }: ProjectDiagramProps) {
             markerEnd={`url(#${markerId})`}
           />
           <line x1="262" y1="150" x2="326" y2="150" className="flow-dash stroke-accent" />
-          <text x="294" y="140" textAnchor="middle" className="fill-ink-3 text-[9px] tracking-[0.12em] uppercase">
+          <text x="294" y="140" textAnchor="middle" className="fill-ink-3 text-xs tracking-[0.12em] uppercase">
             mongo
           </text>
         </g>

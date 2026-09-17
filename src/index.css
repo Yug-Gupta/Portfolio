@@ -36,6 +36,12 @@
   --color-success: #3d6b4f;
   --color-danger: #b4472c;
 
+  /* Type scale — the only sizes used across the site.
+     12px (text-xs) · 13px (text-md) · 14px (text-sm) · 16px (text-base)
+     17px (.t-h4) · plus four fluid display steps (.t-lead/.t-h3/.t-h2/.t-display) */
+  --text-md: 0.8125rem;
+  --text-md--line-height: 1.6;
+
   /* Geometry */
   --radius-xs: 2px;
   --radius-sm: 3px;
@@ -233,10 +239,20 @@ html.dark {
 
   .t-label {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+
+  /* Sentence-case variant for label-length copy — all-caps is reserved
+     for short labels (heuristic: long all-caps hurts readability). */
+  .t-meta-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
     color: var(--color-ink-3);
   }
 
@@ -287,7 +303,10 @@ html.dark {
     overflow: hidden;
   }
 
-  /* ── Buttons ── */
+  /* ── Buttons ──
+     One system: .btn + (primary | outline | ghost) + (sm | md | lg),
+     plus .btn-icon for icon-only actions and .seg-item for segmented
+     controls. Text links use .link / .link-mono and are never buttons. */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -312,7 +331,7 @@ html.dark {
 
   .btn-sm { padding: 0.5rem 0.85rem; font-size: 0.8125rem; }
   .btn-md { padding: 0.72rem 1.15rem; }
-  .btn-lg { padding: 0.9rem 1.5rem; font-size: 0.9375rem; }
+  .btn-lg { padding: 0.85rem 1.4rem; font-size: 0.875rem; }
 
   .btn-primary {
     background: var(--color-ink);
@@ -352,6 +371,7 @@ html.dark {
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
+    flex: none;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-line);
     background: var(--color-surface);
@@ -370,10 +390,10 @@ html.dark {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.28rem 0.6rem;
+    padding: 0.3rem 0.6rem;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.01em;
+    font-size: 0.75rem;
+    letter-spacing: 0;
     color: var(--color-ink-2);
     background: var(--color-surface);
     border: 1px solid var(--color-line);
@@ -389,10 +409,10 @@ html.dark {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.28rem 0.6rem;
+    padding: 0.3rem 0.6rem;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--color-accent);
     background: color-mix(in srgb, var(--color-accent) 8%, transparent);
@@ -445,7 +465,7 @@ html.dark {
     width: 100%;
     padding: 0.75rem 1rem;
     font-family: var(--font-sans);
-    font-size: 0.9375rem;
+    font-size: 1rem;
     color: var(--color-ink);
     background: var(--color-surface);
     border: 1px solid var(--color-line);
@@ -474,10 +494,10 @@ html.dark {
     border-radius: var(--radius-md);
   }
   .seg-item {
-    padding: 0.35rem 0.7rem;
+    padding: 0.4rem 0.7rem;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-ink-3);
     border-radius: var(--radius-xs);
@@ -522,7 +542,7 @@ html.dark {
     align-items: baseline;
     gap: 0.75rem;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-ink-3);

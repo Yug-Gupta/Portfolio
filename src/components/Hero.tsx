@@ -55,11 +55,9 @@ export function Hero({ profile, onOpenResume }: HeroProps) {
           {/* Narrative */}
           <div className="min-w-0 lg:col-span-7">
             <motion.div variants={item} className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className="font-display text-lg font-semibold tracking-tight text-ink">
-                {profile.name}
-              </span>
+              <span className="t-h4">{profile.name}</span>
               <span aria-hidden="true" className="h-px w-8 bg-line-strong" />
-              <span className="t-label">{profile.title}</span>
+              <span className="t-meta-label">{profile.title}</span>
             </motion.div>
 
             <motion.h1 variants={item} className="t-display mt-6 text-ink">
@@ -100,7 +98,7 @@ export function Hero({ profile, onOpenResume }: HeroProps) {
                     href={href}
                     target={href.startsWith('mailto:') ? undefined : '_blank'}
                     rel={href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                    className="grid h-10 w-10 place-items-center rounded-md text-ink-2 transition-colors hover:bg-surface-2 hover:text-accent"
+                    className="btn-icon"
                     aria-label={label}
                   >
                     <Icon size={17} aria-hidden="true" />
@@ -132,7 +130,7 @@ export function Hero({ profile, onOpenResume }: HeroProps) {
           className="rule mt-14 flex flex-wrap items-center gap-x-3 gap-y-2 pt-5 md:mt-20"
         >
           {profile.credentials.map((credential, i) => (
-            <span key={credential} className="t-mono flex items-center gap-3 text-[0.6875rem] text-ink-3">
+            <span key={credential} className="t-mono flex items-center gap-3 text-xs text-ink-3">
               {i > 0 && <span aria-hidden="true" className="text-line-strong">·</span>}
               {credential}
             </span>

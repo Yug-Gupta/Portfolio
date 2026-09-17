@@ -63,7 +63,7 @@ export function ResumeModal({
             className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-xl border border-line-strong bg-surface sm:rounded-xl"
           >
             <div className="flex items-center justify-between gap-6 border-b border-line bg-surface-2 px-6 py-4 sm:px-8">
-              <span className="font-display text-base font-semibold tracking-tight text-ink">
+              <span className="t-h4 text-ink">
                 Curriculum Vitae
               </span>
               <div className="flex items-center gap-2">
@@ -91,7 +91,7 @@ export function ResumeModal({
                     {profile.name}
                   </h1>
                   <p className="t-lead mt-2">{profile.title}</p>
-                  <ul className="t-mono mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[0.6875rem] text-ink-2">
+                  <ul className="t-mono mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-ink-2">
                     <li className="flex items-center gap-2">
                       <Mail size={13} aria-hidden="true" /> {profile.email}
                     </li>
@@ -143,7 +143,7 @@ export function ResumeModal({
                             {exp.role}
                             <span className="font-normal text-ink-3"> · {exp.company}</span>
                           </h4>
-                          <span className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">
+                          <span className="t-meta-label">
                             {exp.period}
                           </span>
                         </div>
@@ -170,7 +170,7 @@ export function ResumeModal({
                       <div key={edu.id}>
                         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                           <h4 className="t-h4 text-ink">{edu.degree}</h4>
-                          <span className="t-mono text-[0.6875rem] uppercase tracking-[0.14em] text-ink-3">
+                          <span className="t-meta-label">
                             {edu.period}
                           </span>
                         </div>

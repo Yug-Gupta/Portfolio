@@ -23,11 +23,11 @@ export function Footer({ profile, onOpenResume }: FooterProps) {
         <div className="grid gap-12 lg:grid-cols-12">
           {/* Identity */}
           <div className="lg:col-span-6">
-            <p className="font-display text-2xl font-medium tracking-tight text-ink">
+            <p className="t-h3 text-ink">
               {profile.name}
             </p>
             <p className="t-small mt-2 max-w-sm">{profile.title}</p>
-            <p className="t-mono mt-6 text-[0.6875rem] text-ink-3">{profile.location}</p>
+            <p className="t-mono mt-6 text-xs text-ink-3">{profile.location}</p>
           </div>
 
           {/* Navigate */}
@@ -36,13 +36,16 @@ export function Footer({ profile, onOpenResume }: FooterProps) {
             <ul className="mt-4 space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.id}>
-                  <button
-                    type="button"
-                    onClick={() => goTo(link.id)}
-                    className="link text-[0.8125rem] text-ink-2"
+                  <a
+                    href={`#${link.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goTo(link.id);
+                    }}
+                    className="link text-md text-ink-2"
                   >
                     {link.label}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -75,17 +78,20 @@ export function Footer({ profile, onOpenResume }: FooterProps) {
         </div>
 
         <div className="rule mt-12 flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="t-mono text-[0.6875rem] text-ink-3">
+          <p className="t-mono text-xs text-ink-3">
             © {new Date().getFullYear()} {profile.name}. Built with React, Vite &amp; Tailwind.
           </p>
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          <a
+            href="#top"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className="link-mono text-ink-3"
           >
             Back to top
             <ArrowUp size={13} aria-hidden="true" />
-          </button>
+          </a>
         </div>
       </div>
     </footer>
